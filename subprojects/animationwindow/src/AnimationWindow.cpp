@@ -259,6 +259,21 @@ void TDT4102::AnimationWindow::draw_image(TDT4102::Point topLeftPoint, TDT4102::
     image.draw(rendererHandle, topLeftPoint, imageWidth, imageHeight, rotationAngleDegrees, rotationOrigin);
 }
 
+void TDT4102::AnimationWindow::draw_image_region(TDT4102::Point topLeftPoint, TDT4102::Image& image, int imageWidth, int imageHeight, TDT4102::Point sourceTopLeftPoint,  int sourceWidth, int sourceHeight, TDT4102::FlipImage flip) {
+    SDL_RendererFlip sdl_flip = SDL_FLIP_NONE;
+    switch (flip){
+        case TDT4102::FlipImage::HORIZONTAL:
+            sdl_flip = SDL_FLIP_HORIZONTAL;
+            break;
+        case TDT4102::FlipImage::VERTICAL:
+            sdl_flip = SDL_FLIP_VERTICAL;
+            break;
+        default:
+            sdl_flip = SDL_FLIP_NONE;
+    }
+    image.drawRegion(rendererHandle, topLeftPoint, imageWidth, imageHeight, sourceTopLeftPoint, sourceWidth, sourceHeight, sdl_flip);
+}
+
 void TDT4102::AnimationWindow::draw_text(TDT4102::Point topLeftPoint, std::string textToShow, TDT4102::Color color, unsigned int fontSize, TDT4102::Font font) {
     textWindowCounter++;
     std::stringstream windowName;
