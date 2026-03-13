@@ -6,15 +6,12 @@
 #include "Widget.h"
 
 
-class Node : public TDT4102::Widget
+class Node
 {
 private:
-    std::string label;
-    static constexpr unsigned int nodeRadius = 25;
-    static constexpr unsigned int widgetSize = 20;
 
 protected:
-    void update(nk_context* context) override;
+
 public:
-    explicit Node(TDT4102::Point location);
+
 };
