@@ -9,7 +9,4 @@ namespace TestGraph
 void testLoad();
 void testSave();
 void testAddNode();
-void testRemoveEdge();
-void testAddSelected();
-void testNodeDeleted();
 }

@@ -41,17 +41,3 @@ void TestGraph::testAddNode(){
     Graph g;
     g.addNode({500, 500}, 3);
 }
-#define RemoveEdge
-void TestGraph::testRemoveEdge(){
-    #ifndef RemoveEdge
-    Graph g;
-    g.removeEdge(/*...*/)
-    /*...*/
-    #endif
-}
-void TestGraph::testAddSelected(){
-    /*...*/
-}
-void TestGraph::testNodeDeleted(){
-    /*...*/
-}
