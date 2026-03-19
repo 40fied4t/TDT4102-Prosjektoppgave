@@ -9,7 +9,7 @@
 //Egendefinerte typer
 typedef std::vector<std::shared_ptr<Node>> NodeVec;
 typedef std::unordered_map<std::shared_ptr<Node>, NodeVec> GraphMap;
-typedef std::vector<std::shared_ptr<Node>> EdgeVec;
+typedef std::unordered_map<std::shared_ptr<Node>, std::shared_ptr<Node>> EdgeMap;
 
 class Graph
 {
@@ -17,21 +17,22 @@ private:
     int numNodes;
     int nextLabel;
     GraphMap graphMap;
-    EdgeVec edgeVec;
+    EdgeMap edgeMap;
     NodeVec nodes;
     NodeVec selectedNodes;
 
-protected:
+public:
     void updateSelectedNodes();
     void addEdges();
     void removeEdges();
     void addNode(const TDT4102::Point location, const int& label);
     void removeNode();
     void removeSelectedNodes();
+    int getSize();
 
 
-public:
     Graph();
+    Graph(std::filesystem::path fileName);
     ~Graph();
 
     void loadFromAdj(std::filesystem::path fileName);
@@ -39,7 +40,6 @@ public:
 
     void saveToAdj(std::filesystem::path fileName);
     void saveToEdg(std::filesystem::path fileName);
-
 };
 
 class Node
