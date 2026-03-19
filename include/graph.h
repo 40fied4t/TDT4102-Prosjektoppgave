@@ -21,10 +21,8 @@ private:
 
 protected:
     void updateSelectedNodes();
-
     void addEdges();
     void removeEdges();
-
     void addNode(const TDT4102::Point location, const int& label);
     void removeNode();
     void removeSelectedNodes();
@@ -48,4 +46,6 @@ private:
 public:
     TDT4102::Point getLocation() const;
     int getLabel() const;
+    bool isSelected() const;
+    void updateSelect();
 };
