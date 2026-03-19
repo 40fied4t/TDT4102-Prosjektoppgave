@@ -28,8 +28,12 @@ private:
 public:
     void updateSelectedNodes();
     void updateNextLabel();
-    void addEdges();
-    void removeEdges();
+
+    void addEdge(std::shared_ptr<Node> node1, std::shared_ptr<Node> node2);
+    void addSelectedEdges();
+
+    void removeEdge(std::shared_ptr<Node> node1, std::shared_ptr<Node> node2);
+    void removeSelectedEdges();
     void addNode(const TDT4102::Point location, const int& label);
     void removeNode();
     void removeSelectedNodes();
@@ -56,8 +60,7 @@ private:
     bool selected = false;
     TDT4102::Point  location;
 public:
-    Node(TDT4102::Point location, const int& label);
-    ~Node();
+    Node(TDT4102::Point location, const int label);
     TDT4102::Point getLocation() const;
     int getLabel() const;
     bool isSelected() const;

@@ -1,31 +1,51 @@
 #include "graph.h"
 //implementer Node
-Node::Node(TDT4102::Point location, const int& label):
+Node::Node(TDT4102::Point location, const int label):
     label{label},
     location{location}
 {}
+
 TDT4102::Point Node::getLocation() const {
     return location;
 }
+
 int Node::getLabel() const {
     return label;
 }
+
 bool Node::isSelected() const {
     return selected;
 }
+
 void Node::updateSelect() {
     selected = !selected;
 }
 
-
 //implementer Graph
 void Graph::updateSelectedNodes(){
-    for (auto it = nodes.begin(); it != nodes.end();++it) {
-
+    selectedNodes.clear();
+    for (auto &it : nodes) {
+        if (it -> isSelected()) {
+            selectedNodes.emplace_back(*it);
+        }
     }
 }
-void Graph::addEdges(){}
-void Graph::removeEdges(){}
+
+void Graph::updateNextLabel() {
+    nextLabel = 1;
+    for (auto &it : nodes) {
+        if (nextLabel <= it -> getLabel()) {
+            nextLabel = it -> getLabel() + 1;
+        }
+    }
+}
+void Graph::addEdge(std::shared_ptr<Node> node1, std::shared_ptr<Node> node2) {
+    for (auto &it : edgeVec) {
+        
+    }
+}
+void Graph::addSelectedEdges(){}
+void Graph::removeSelectedEdges(){}
 void Graph::addNode(const TDT4102::Point location, const int& label){}
 void Graph::removeNode(){}
 void Graph::removeSelectedNodes(){}
