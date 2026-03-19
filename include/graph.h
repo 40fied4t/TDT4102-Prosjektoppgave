@@ -3,12 +3,13 @@
 #include <memory>
 #include <vector>
 #include <unordered_map>
+#include <filesystem>
 
 #include "AnimationWindow.h"
 //Egendefinerte typer
 typedef std::vector<std::shared_ptr<Node>> NodeVec;
 typedef std::unordered_map<std::shared_ptr<Node>, NodeVec> GraphMap;
-
+typedef std::vector<std::shared_ptr<Node>> EdgeVec;
 
 class Graph
 {
@@ -16,6 +17,7 @@ private:
     int numNodes;
     int nextLabel;
     GraphMap graphMap;
+    EdgeVec edgeVec;
     NodeVec nodes;
     NodeVec selectedNodes;
 
@@ -32,8 +34,12 @@ public:
     Graph();
     ~Graph();
 
-    friend std::ostream& operator<<(std::ostream& os, const GraphMap& map);
-    friend std::istream& operator>>(std::istream& is, GraphMap& map);
+    void loadFromAdj(std::filesystem::path fileName);
+    void loadFromEdg(std::filesystem::path fileName);
+
+    void saveToAdj(std::filesystem::path fileName);
+    void saveToEdg(std::filesystem::path fileName);
+
 };
 
 class Node
