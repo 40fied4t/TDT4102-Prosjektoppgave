@@ -2,6 +2,7 @@
 subprojects
 build
 .vscode
+relevanteØvinger
 
 # Prerequisites
 *.d
