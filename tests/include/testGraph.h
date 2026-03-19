@@ -1,15 +1,15 @@
 #pragma once
 
 #include "graph.h"
+#include <iostream>
 #include <filesystem>
 
 namespace TestGraph
 {
-bool testLoad(std::filesystem::path fileName) {
-
-}
-
-bool testSave(std::filesystem::path fileName) {
-
-}
+void testLoad();
+void testSave();
+void testAddNode();
+void testRemoveEdge();
+void testAddSelected();
+void testNodeDeleted();
 }
