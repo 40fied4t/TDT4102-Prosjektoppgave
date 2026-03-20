@@ -15,7 +15,9 @@ private:
     static constexpr int width = 1000;
     static constexpr int height = 500;
 
-    int nextLabel = 1;
+    std::string nextLabel;
+    std::vector<std::string> labelVec;
+
     std::unordered_map<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>> graphMap;
     std::vector<std::unique_ptr<Edge>> edgeVec;
     std::vector<std::shared_ptr<Node>> nodes;
@@ -33,12 +35,14 @@ public:
     void removeEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to);
     void removeAllEdgesToNode(std::shared_ptr<Node> node);
     void removeSelectedEdges();
-    void addNode(const TDT4102::Point location, const int& label);
+    void addNode(const TDT4102::Point location, std::string label);
     void removeNode();
     void removeSelectedNodes();
     int getSize() const;
     int getEdgeNum() const;
 
+    std::shared_ptr<Node> getNode(const std::string& label) const;
+    std::vector<TDT4102::Point> generatePositions(const int& n);
     void empty();
     template <typename T>
     bool leadsTo(std::unordered_map<T, std::vector<T>> map, T from, T to) {

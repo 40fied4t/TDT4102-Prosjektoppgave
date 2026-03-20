@@ -85,19 +85,9 @@ void Graph::addEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const 
 
 void Graph::addDirectionalEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight) {
     if (from == to) {return;}
-    bool alreadyTo = false;
-    bool alreadyFrom = false;
-    for (auto &it : graphMap[from]) {
-        if (it == to){
-            alreadyFrom = true;
-        }
-    }
-    for (auto &it : graphMap[to]) {
-        if (it == from){
-            alreadyTo = true;
-        }
-    }
-    if (alreadyFrom || alreadyTo) {return;}
+    bool alreadyFromFromToTo = leadsTo<std::shared_ptr<Node>>(graphMap, from, to);
+    bool alreadyFromToToFrom = leadsTo<std::shared_ptr<Node>>(graphMap, to, from);
+    if (alreadyFromFromToTo || alreadyFromToToFrom) {return;}
 
     graphMap[from].push_back(to);
     edgeVec.emplace_back(std::make_unique<DirectionalEdge>(from, to, weight));
@@ -116,8 +106,10 @@ void Graph::addSelectedEdges(const int weight){
 void Graph::removeEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to) {}
 void Graph::removeSelectedEdges(){}
 
-void Graph::removeAllEdgesToNode(std::shared_ptr<Node>){}
-void Graph::addNode(const TDT4102::Point location, const int& label){}
+void Graph::removeAllEdgesToNode(std::shared_ptr<Node> node){}
+void Graph::addNode(const TDT4102::Point location, std::string label){
+    nodes.push_back(std::make_shared<Node>(location, label));
+}
 void Graph::removeNode(){}
 void Graph::removeSelectedNodes(){}
 int Graph::getSize() const {
@@ -127,12 +119,31 @@ int Graph::getEdgeNum() const {
     return edgeVec.size();
 }
 
+std::shared_ptr<Node> Graph::getNode(const std::string& label) const {
+    for (auto &it : nodes) {
+        if (it -> getLabel() == label) {
+            return it;
+        }
+    }
+    std::cerr << "Node not found!" << std::endl;
+    return nullptr;
+}
 void Graph::empty() {
     nextLabel = 1;
     graphMap.clear();
     edgeVec.clear();
     nodes.clear();
     selectedNodes.clear();
+}
+
+std::vector<TDT4102::Point> Graph::generatePositions(const int& n) {
+    int d = width/(2*n);
+    std::vector<TDT4102::Point> positionVec;
+    positionVec.reserve(n);
+    for (int i = 0; i < n; ++i) {
+        positionVec.push_back({d * (2*i + 1), height/2});
+    }
+    return positionVec;
 }
 
 Graph::Graph():
@@ -148,9 +159,6 @@ Graph::Graph(std::filesystem::path fileName){}
 Graph::~Graph(){}
 
 void Graph::loadFromAdj(std::filesystem::path fileName){
-    //Resetter graf
-    empty();
-
     std::ifstream inputStream{fileName};
     try {
         if (!inputStream) {
@@ -169,24 +177,53 @@ void Graph::loadFromAdj(std::filesystem::path fileName){
         return;
     }
 
-    //
+    //generer referansestrukturer for generering av graf
     std::string key;
     std::string val;
     char delim;
     std::unordered_map<std::string, std::vector<std::string>> labelMap;
-    std::vector<std::string> labelVec;
     while (inputStream) {
         inputStream >> key;
         inputStream >> delim;
+
+        labelVec.push_back(key);
 
         if (delim != ':') {
             throw BadFormat();
             return;
         }
         while (inputStream >> val) {
-            if (val == "\n") {break;}
-
+            if (val == "\n" || val == "\r\n" || val == "\r") {break;}
             labelMap[key].push_back(val);
+        }
+    }
+    std::vector<TDT4102::Point> positionVec = generatePositions(labelVec.size());
+    //Avbryt dersom 
+    if (labelMap.size() != positionVec.size() != labelVec.size()) {
+        throw BadFormat();
+        return;
+    }
+    //tøm graf og generer nye noder
+    empty();
+    for (int i = 0; i < labelVec.size(); ++i) {
+        addNode(positionVec[i], labelVec[i]);
+    }
+    updateNextLabel();
+    //generer kanter
+    for (auto i = labelVec.begin(); i != labelVec.end(); ++i) {
+        for (auto j = i +1; j != labelVec.end(); ++i) {
+            bool iToj = leadsTo<std::string>(labelMap, *i, *j);
+            bool jToi = leadsTo<std::string>(labelMap, *j, *i);
+
+            if (iToj && jToi) {
+                addEdge(getNode(*i), getNode(*j), 1);
+            }
+            else if (iToj) {
+                addDirectionalEdge(getNode(*i), getNode(*j), 1);
+            }
+            else if (jToi) {
+                addDirectionalEdge(getNode(*j), getNode(*i), 1);
+            }
         }
     }
 }
