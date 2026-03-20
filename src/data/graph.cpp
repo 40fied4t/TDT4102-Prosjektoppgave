@@ -1,4 +1,5 @@
-#include "graph.h"
+#include "include/graph.h"
+
 //implementer Node
 Node::Node(TDT4102::Point location, std::string label):
     label{label},
@@ -146,11 +147,11 @@ std::vector<TDT4102::Point> Graph::generatePositions(const int& n) {
     return positionVec;
 }
 
-Graph::Graph():
-    graphMap{},
-    edgeVec{},
-    nodes{},
-    selectedNodes{}
+Graph::Graph()
+    // graphMap{},
+    // edgeVec{},
+    // nodes{},
+    // selectedNodes{}
 {
     addNode({width/2, height/2}, nextLabel);
     updateNextLabel();
@@ -186,6 +187,12 @@ void Graph::loadFromAdj(std::filesystem::path fileName){
         inputStream >> key;
         inputStream >> delim;
 
+        for (auto &it : labelVec) {
+            if (it == key) {
+                throw BadFormat();
+                return;
+            }
+        }
         labelVec.push_back(key);
 
         if (delim != ':') {

@@ -1,10 +1,11 @@
-#include "include/node.h"
-#include "tests/test.h"
+#pragma once
+#include "tests/include/testGraph.h"
+#include "include/graph.h"
 
 
 int main() {
     // Show a nice message in the Terminal window
-    Testing::test();
+    TestGraph::testLoad();
     return 0;
 }
 

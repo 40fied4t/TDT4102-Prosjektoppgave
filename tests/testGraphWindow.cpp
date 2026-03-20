@@ -1,1 +1,1 @@
-#include "testGraphWindow.h"
+#include "tests/include/testGraphWindow.h"
