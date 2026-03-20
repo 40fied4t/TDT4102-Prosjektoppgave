@@ -17,14 +17,19 @@ class WrongFileExtension : public std::exception
 {
 private:
     std::filesystem::path fileName;
-    std::string expectedExtension;
+    std::filesystem::path expectedExtension;
 public:
-    WrongFileExtension(std::filesystem::path fileName, std::string expectedExtension):
+    WrongFileExtension(std::filesystem::path fileName, std::filesystem::path expectedExtension):
     fileName{fileName}, 
     expectedExtension{expectedExtension}
     {}
 
     const char* what() const noexcept override {return "Feil filtype!";}
     std::filesystem::path getPath() {return fileName;}
-    std::string getExtension() {return expectedExtension;}
+    std::filesystem::path getExtension() {return expectedExtension;}
+};
+
+struct BadFormat : public std::exception
+{
+    const char* what() const noexcept override {return "Feil formatering";}
 };
