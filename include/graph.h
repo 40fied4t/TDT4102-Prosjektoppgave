@@ -5,13 +5,10 @@
 #include <unordered_map>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 
 #include "AnimationWindow.h"
-//Egendefinerte typer
-// typedef std::vector<std::shared_ptr<Node>> NodeVec;
-// typedef std::unordered_map<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>> GraphMap;
-// typedef std::vector<std::vector<std::shared_ptr<Node>>> EdgeVec;
-
+#include "exception.h"
 class Graph
 {
 private:
@@ -20,7 +17,7 @@ private:
 
     int nextLabel = 1;
     std::unordered_map<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>> graphMap;
-    std::vector<std::vector<std::shared_ptr<Node>>> edgeVec;
+    std::vector<std::unique_ptr<Edge>> edgeVec;
     std::vector<std::shared_ptr<Node>> nodes;
     std::vector<std::shared_ptr<Node>> selectedNodes;
 
@@ -28,16 +25,19 @@ public:
     void updateSelectedNodes();
     void updateNextLabel();
 
-    void addEdge(std::shared_ptr<Node> node1, std::shared_ptr<Node> node2);
-    void addSelectedEdges();
+    void addEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight);
+    void addDirectionalEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to , const int weight);
+    
+    void addSelectedEdges(const int weight);
 
-    void removeEdge(std::shared_ptr<Node> node1, std::shared_ptr<Node> node2);
+    void removeEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to);
+    void removeAllEdgesToNode(std::shared_ptr<Node> node);
     void removeSelectedEdges();
     void addNode(const TDT4102::Point location, const int& label);
     void removeNode();
     void removeSelectedNodes();
-    int getSize();
-    int getEdgeNum();
+    int getSize() const;
+    int getEdgeNum() const;
 
 
     Graph() = default;

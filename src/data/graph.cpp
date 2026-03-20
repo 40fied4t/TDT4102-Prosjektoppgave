@@ -22,7 +22,7 @@ void Node::updateSelect() {
 }
 
 //implementer Edge, og arvede klasser
-Edge::Edge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight):
+Edge::Edge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, int weight):
     nodeVec{from, to},
     weight{weight}
 {}
@@ -36,7 +36,7 @@ std::vector<std::shared_ptr<Node>> Edge::getFrom() const {
     return nodeVec;
 }
 
-DirectionalEdge::DirectionalEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight):
+DirectionalEdge::DirectionalEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, int weight):
     Edge{from, to, weight}
 {}
 
@@ -72,48 +72,122 @@ void Graph::updateNextLabel() {
         }
     }
 }
-void Graph::addEdge(std::shared_ptr<Node> node1, std::shared_ptr<Node> node2) {
-    if (node1 == node2) {
-        return;
+void Graph::addEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight){
+    bool alreadyTo = false;
+    bool alreadyFrom = false;
+    for (auto &it : graphMap[from]) {
+        if (it == to){
+            alreadyFrom = true;
+        }
     }
-    bool alreadyInVec = false;
-    for (auto &it : graphMap[node1]) {
-        if (it == node2) {alreadyInVec = true;}
+    for (auto &it : graphMap[to]) {
+        if (it == from){
+            alreadyTo = true;
+        }
     }
-    if (!alreadyInVec) {
-            graphMap[node1].push_back(node2);
-            graphMap[node2].push_back(node1);
-            edgeVec.push_back({node1, node2});
-    }
+    if (alreadyFrom || alreadyFrom) {return;}
+    
+    graphMap[from].push_back(to);
+    graphMap[to].push_back(from);
+    edgeVec.emplace_back(std::make_unique<Edge>(from, to, weight));
 }
-void Graph::addSelectedEdges(){
+
+void Graph::addDirectionalEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight) {
+    if (from == to) {return;}
+    bool alreadyTo = false;
+    bool alreadyFrom = false;
+    for (auto &it : graphMap[from]) {
+        if (it == to){
+            alreadyFrom = true;
+        }
+    }
+    for (auto &it : graphMap[to]) {
+        if (it == from){
+            alreadyTo = true;
+        }
+    }
+    if (alreadyFrom || alreadyTo) {return;}
+
+    graphMap[from].push_back(to);
+    edgeVec.emplace_back(std::make_unique<DirectionalEdge>(from, to, weight));
+}
+
+void Graph::addSelectedEdges(const int weight){
     updateSelectedNodes();
+
     for (auto i = selectedNodes.begin(); i != selectedNodes.end(); ++i) {
-        for (auto j = i + 1; j != selectedNodes.end(); ++j) {
-            addEdge(*i, *j);
+        for (auto j = i; j != selectedNodes.end(); ++j) {
+            addEdge(*i, *j, weight);
         }
     }
 }
-void Graph::removeEdge(std::shared_ptr<Node> node1, std::shared_ptr<Node> node2) {
 
-}
+void Graph::removeEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to) {}
 void Graph::removeSelectedEdges(){}
+
+void Graph::removeAllEdgesToNode(std::shared_ptr<Node>){}
 void Graph::addNode(const TDT4102::Point location, const int& label){}
 void Graph::removeNode(){}
 void Graph::removeSelectedNodes(){}
-int Graph::getSize(){}
-int Graph::getEdgeNum(){}
+int Graph::getSize() const {
+    return nodes.size();
+}
+int Graph::getEdgeNum() const {
+    return edgeVec.size();
+}
 
 
-Graph::Graph(){
+Graph::Graph():
+    graphMap{},
+    edgeVec{},
+    nodes{},
+    selectedNodes{}
+{
     addNode({width/2, height/2}, nextLabel);
     updateNextLabel();
 }
 Graph::Graph(std::filesystem::path fileName){}
 Graph::~Graph(){}
 
-void Graph::loadFromAdj(std::filesystem::path fileName){}
-void Graph::loadFromEdg(std::filesystem::path fileName){}
+void Graph::loadFromAdj(std::filesystem::path fileName){
+    graphMap.clear();
+    edgeVec.clear();
+    nodes.clear();
+    selectedNodes.clear();
 
-void Graph::saveToAdj(std::filesystem::path fileName){}
-void Graph::saveToEdg(std::filesystem::path fileName){}
+    std::ifstream inputStream{fileName};
+    try {
+        if (!inputStream) {
+            throw FileNotOpen{fileName};
+        }
+        if (!std::filesystem::equivalent(fileName.extension(), std::filesystem::path(".adj"))) {
+            throw WrongFileExtension{fileName, std::filesystem::path(".adj")};
+        }
+    }
+    catch (FileNotOpen e){
+        std::cerr << e.what() << " " << e.getPath() << std::endl;
+        return;
+    }
+    catch (WrongFileExtension e) {
+        std::cerr << e.what() << "\nforventet: " << e.getExtension() << "\fikk: " << e.getPath() << std::endl;
+        return;
+    }
+    std::string nextString;
+    int nextLabel;
+    while (!inputStream) {
+        
+    }
+}
+void Graph::loadFromEdg(std::filesystem::path fileName){
+    
+}
+
+void Graph::saveToAdj(std::filesystem::path fileName){
+
+}
+void Graph::saveToEdg(std::filesystem::path fileName){
+    graphMap.clear();
+    edgeVec.clear();
+    nodes.clear();
+    selectedNodes.clear();
+}
