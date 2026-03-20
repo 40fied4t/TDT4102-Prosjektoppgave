@@ -18,7 +18,6 @@ private:
     static constexpr int width = 1000;
     static constexpr int height = 500;
 
-    int numNodes = 0;
     int nextLabel = 1;
     std::unordered_map<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>> graphMap;
     std::vector<std::vector<std::shared_ptr<Node>>> edgeVec;
@@ -65,4 +64,31 @@ public:
     int getLabel() const;
     bool isSelected() const;
     void updateSelect();
+};
+
+class Edge
+{
+private:
+    const int weight;
+protected:
+    std::vector<std::shared_ptr<Node>> nodeVec;
+public:
+    
+    virtual std::vector<std::shared_ptr<Node>> getTo() const;
+    virtual std::vector<std::shared_ptr<Node>> getFrom() const;
+    virtual int getWeight() const;
+
+    Edge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight);
+    Edge(std::shared_ptr<Node> from, std::shared_ptr<Node> to);
+};
+
+class DirectionalEdge : public Edge
+{
+
+public:
+    virtual std::vector<std::shared_ptr<Node>> getTo() const override;
+    virtual std::vector<std::shared_ptr<Node>> getFrom() const override;
+
+    DirectionalEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight);
+    DirectionalEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to);
 };
