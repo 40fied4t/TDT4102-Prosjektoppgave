@@ -1,6 +1,6 @@
 #include "graph.h"
 //implementer Node
-Node::Node(TDT4102::Point location, const int label):
+Node::Node(TDT4102::Point location, std::string label):
     label{label},
     location{location}
 {}
@@ -9,7 +9,7 @@ TDT4102::Point Node::getLocation() const {
     return location;
 }
 
-int Node::getLabel() const {
+std::string Node::getLabel() const {
     return label;
 }
 
@@ -60,15 +60,6 @@ void Graph::updateSelectedNodes(){
     for (auto &it : nodes) {
         if (it -> isSelected()) {
             selectedNodes.emplace_back(*it);
-        }
-    }
-}
-
-void Graph::updateNextLabel() {
-    nextLabel = 1;
-    for (auto &it : nodes) {
-        if (nextLabel <= it -> getLabel()) {
-            nextLabel = it -> getLabel() + 1;
         }
     }
 }
@@ -136,6 +127,13 @@ int Graph::getEdgeNum() const {
     return edgeVec.size();
 }
 
+void Graph::empty() {
+    nextLabel = 1;
+    graphMap.clear();
+    edgeVec.clear();
+    nodes.clear();
+    selectedNodes.clear();
+}
 
 Graph::Graph():
     graphMap{},
@@ -150,10 +148,8 @@ Graph::Graph(std::filesystem::path fileName){}
 Graph::~Graph(){}
 
 void Graph::loadFromAdj(std::filesystem::path fileName){
-    graphMap.clear();
-    edgeVec.clear();
-    nodes.clear();
-    selectedNodes.clear();
+    //Resetter graf
+    empty();
 
     std::ifstream inputStream{fileName};
     try {
@@ -172,10 +168,26 @@ void Graph::loadFromAdj(std::filesystem::path fileName){
         std::cerr << e.what() << "\nforventet: " << e.getExtension() << "\fikk: " << e.getPath() << std::endl;
         return;
     }
-    std::string nextString;
-    int nextLabel;
-    while (!inputStream) {
-        
+
+    //
+    std::string key;
+    std::string val;
+    char delim;
+    std::unordered_map<std::string, std::vector<std::string>> labelMap;
+    std::vector<std::string> labelVec;
+    while (inputStream) {
+        inputStream >> key;
+        inputStream >> delim;
+
+        if (delim != ':') {
+            throw BadFormat();
+            return;
+        }
+        while (inputStream >> val) {
+            if (val == "\n") {break;}
+
+            labelMap[key].push_back(val);
+        }
     }
 }
 void Graph::loadFromEdg(std::filesystem::path fileName){

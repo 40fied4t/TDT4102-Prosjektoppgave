@@ -39,6 +39,14 @@ public:
     int getSize() const;
     int getEdgeNum() const;
 
+    void empty();
+    template <typename T>
+    bool leadsTo(std::unordered_map<T, std::vector<T>> map, T from, T to) {
+        for (auto &it : map[from]) {
+            if (it == to) {return true;}
+        }
+        return false;
+    }
 
     Graph() = default;
     Graph(std::filesystem::path fileName);
@@ -54,14 +62,14 @@ public:
 class Node
 {
 private:
-    const int label;
+    std::string label;
     static constexpr int radius = 25;
     bool selected = false;
     TDT4102::Point  location;
 public:
-    Node(TDT4102::Point location, const int label);
+    Node(TDT4102::Point location, std::string label);
     TDT4102::Point getLocation() const;
-    int getLabel() const;
+    std::string getLabel() const;
     bool isSelected() const;
     void updateSelect();
 };
