@@ -37,6 +37,14 @@ std::vector<std::shared_ptr<Node>> Edge::getFrom() const {
     return nodeVec;
 }
 
+std::vector<std::shared_ptr<Node>> Edge::getTo() const {
+    return nodeVec;
+}
+
+int Edge::getWeight() const {
+    return weight;
+}
+
 DirectionalEdge::DirectionalEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, int weight):
     Edge{from, to, weight}
 {}
@@ -60,10 +68,19 @@ void Graph::updateSelectedNodes(){
     selectedNodes.clear();
     for (auto &it : nodes) {
         if (it -> isSelected()) {
-            selectedNodes.emplace_back(*it);
+            selectedNodes.emplace_back(it);
         }
     }
 }
+void Graph::updateNextLabel(){
+    #define nextlabel
+
+    #ifndef nextlebel
+
+    #endif
+    return;
+}
+
 void Graph::addEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight){
     bool alreadyTo = false;
     bool alreadyFrom = false;
@@ -105,11 +122,19 @@ void Graph::addSelectedEdges(const int weight){
 }
 
 void Graph::removeEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to) {}
-void Graph::removeSelectedEdges(){}
+void Graph::removeSelectedEdges(){
+    #define rmSelEd
+
+    #ifndef rmSelEd
+
+    #endif
+
+    return;
+}
 
 void Graph::removeAllEdgesToNode(std::shared_ptr<Node> node){}
 void Graph::addNode(const TDT4102::Point location, std::string label){
-    nodes.push_back(std::make_shared<Node>(location, label));
+    nodes.emplace_back(std::make_shared<Node>(location, label));
 }
 void Graph::removeNode(){}
 void Graph::removeSelectedNodes(){}
@@ -148,15 +173,34 @@ std::vector<TDT4102::Point> Graph::generatePositions(const int& n) {
 }
 
 Graph::Graph()
-    // graphMap{},
-    // edgeVec{},
-    // nodes{},
-    // selectedNodes{}
 {
+    graphMap = std::unordered_map<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>>();
+    edgeVec = std::vector<std::unique_ptr<Edge>>();
+    nodes = std::vector<std::shared_ptr<Node>>();
+    selectedNodes = std::vector<std::shared_ptr<Node>>();
     addNode({width/2, height/2}, nextLabel);
     updateNextLabel();
 }
-Graph::Graph(std::filesystem::path fileName){}
+Graph::Graph(std::filesystem::path fileName)
+{
+    graphMap = std::unordered_map<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>>();
+    edgeVec = std::vector<std::unique_ptr<Edge>>();
+    nodes = std::vector<std::shared_ptr<Node>>();
+    selectedNodes = std::vector<std::shared_ptr<Node>>();
+
+    if (fileName.extension() == ".adj") {
+        std::cout << "Loading .adj file\n";
+        loadFromAdj(fileName);
+
+    }
+    else if (fileName.extension() == ".edg") {
+        std::cout << "Loading .edg file\n";
+        loadFromEdg(fileName);
+    }
+    else {
+        std::cerr << "File does not have correct format extension";
+    }
+}
 Graph::~Graph(){}
 
 void Graph::loadFromAdj(std::filesystem::path fileName){
@@ -165,7 +209,7 @@ void Graph::loadFromAdj(std::filesystem::path fileName){
         if (!inputStream) {
             throw FileNotOpen{fileName};
         }
-        if (!std::filesystem::equivalent(fileName.extension(), std::filesystem::path(".adj"))) {
+        if (fileName.extension() != std::filesystem::path(".adj")) {
             throw WrongFileExtension{fileName, std::filesystem::path(".adj")};
         }
     }
@@ -183,30 +227,37 @@ void Graph::loadFromAdj(std::filesystem::path fileName){
     std::string val;
     char delim;
     std::unordered_map<std::string, std::vector<std::string>> labelMap;
+    try{
     while (inputStream) {
         inputStream >> key;
         inputStream >> delim;
 
         for (auto &it : labelVec) {
             if (it == key) {
+                std::cerr << "badFormat\n";
                 throw BadFormat();
-                return;
             }
         }
         labelVec.push_back(key);
 
         if (delim != ':') {
             throw BadFormat();
-            return;
         }
         while (inputStream >> val) {
             if (val == "\n" || val == "\r\n" || val == "\r") {break;}
             labelMap[key].push_back(val);
         }
     }
+    } catch (BadFormat e) {
+        std::cout << e.what();
+        return;
+    }
+
     std::vector<TDT4102::Point> positionVec = generatePositions(labelVec.size());
     //Avbryt dersom 
-    if (labelMap.size() != positionVec.size() != labelVec.size()) {
+    if (labelMap.size() != positionVec.size() || positionVec.size() != labelVec.size()) {
+        std::cout << labelMap.size() << " " << positionVec.size() << " " << labelVec.size() << std::endl;
+        std::cerr << "badFormat\n";
         throw BadFormat();
         return;
     }

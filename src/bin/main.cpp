@@ -1,4 +1,3 @@
-#pragma once
 #include "tests/include/testGraph.h"
 #include "include/graph.h"
 

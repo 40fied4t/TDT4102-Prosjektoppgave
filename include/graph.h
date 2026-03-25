@@ -35,7 +35,7 @@ public:
     
     virtual std::vector<std::shared_ptr<Node>> getTo() const;
     virtual std::vector<std::shared_ptr<Node>> getFrom() const;
-    virtual int getWeight() const;
+    int getWeight() const;
 
     Edge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight);
     Edge(std::shared_ptr<Node> from, std::shared_ptr<Node> to);
@@ -94,7 +94,7 @@ public:
         return false;
     }
 
-    Graph() = default;
+    Graph();
     Graph(std::filesystem::path fileName);
     ~Graph();
 
