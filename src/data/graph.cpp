@@ -87,6 +87,18 @@ void Graph::updateNextLabel(){
     nextLabel = std::to_string(labelInt);
 }
 
+void Graph::resetLabels() {
+    labelVec.clear();
+    std::string newLabel;
+    nextLabel = "1";
+    for (int i = 0; i < getSize(); i++) {
+        newLabel = nextLabel;
+        nextLabel = std::to_string(i + 2);
+        nodes[i] -> setLabel(newLabel);
+        labelVec.push_back(newLabel);
+    }
+}
+
 void Graph::addEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight){
     bool alreadyTo = false;
     bool alreadyFrom = false;

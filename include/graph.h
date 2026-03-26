@@ -33,6 +33,10 @@ public:
     /// @return label.
     std::string getLabel() const;
 
+    /// @brief Setter nytt navn for noden.
+    /// @param newLabel det nyet navnet til noden.
+    void setLabel(const std::string& newLabel) {label = newLabel;}
+
     /// @brief Viser om noden er valgt.
     /// @return selected.
     bool isSelected() const;
@@ -111,7 +115,7 @@ private:
     static constexpr int width = 1000;  ///< Vinduets bredde.
     static constexpr int height = 500;  ///< Vinduets høyde.
 
-    std::string nextLabel = "NULL";     ///< Navnet som blir gitt neste genererte node.
+    std::string nextLabel = "1";     ///< Navnet som blir gitt neste genererte node.
     std::vector<std::string> labelVec;  ///< Referansevektor for opptatte navn.
 
     /// @brief Oppslagsverk for hvor en node fører
