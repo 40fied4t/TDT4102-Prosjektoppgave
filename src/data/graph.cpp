@@ -141,10 +141,55 @@ void Graph::addSelectedEdges(const int weight){
 
 void Graph::removeEdge(std::shared_ptr<Node> first, std::shared_ptr<Node> second) {
     //Fjerner kanten fra edgeVec
-    bool firstFound = false;
-    bool secondFound = false;
-
-    //Fjerner kanten fra graphMap
+    if (first == second) return;
+    bool firstFound;
+    bool secondFound;
+    for (auto& it : edgeVec) {
+        firstFound = false;
+        secondFound = false;
+        for (auto nodeIterator : it -> getNodeVec()) {
+            if (nodeIterator == first) {
+                firstFound = true;
+            }
+            if (nodeIterator == second) {
+                secondFound = true;
+            }
+        }
+        if (firstFound && secondFound) {
+            edgeVec.erase(
+                std::remove_if( // Fjern elementet fra edgeVec
+                    edgeVec.begin(),
+                    edgeVec.end(),
+                    //Benytter lambdafunksjon som predikat
+                    [&] (std::unique_ptr<Edge> const& p)
+                        {   // Predikatet sjekker om de peker til samme underliggende Edge
+                        return p == it;
+                    }),
+                edgeVec.end()
+                );
+            //Fjerner kanten fra graphMap
+            for (auto& fromIt : it -> getFrom()) {
+                graphMap[fromIt].erase(
+                    std::remove_if( // Fjerner element fra graphMap[fromIt] dersom det ligger i toIt
+                        graphMap[fromIt].begin(),
+                        graphMap[fromIt].end(),
+                        //Benytter lambdafunksjon som predikat
+                        [&] (std::shared_ptr<Node> const& p)
+                            {
+                            for (auto& toIt : it -> getTo()) {
+                                if (p == toIt) return true;
+                            }
+                            return false;
+                        }),
+                    graphMap[fromIt].end()
+                    );
+            }
+            //Fant kanten
+            return;
+        }
+    }
+    // Fant ikke kanten
+    return;
 }
 
 void Graph::removeSelectedEdges(){
