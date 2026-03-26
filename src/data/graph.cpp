@@ -193,9 +193,20 @@ void Graph::removeEdge(std::shared_ptr<Node> first, std::shared_ptr<Node> second
 }
 
 void Graph::removeSelectedEdges(){
+    updateSelectedNodes();
+
+    for (auto i = selectedNodes.begin(); i != selectedNodes.end();++i) {
+        for (auto j = i + 1; j != selectedNodes.end();++j) {
+            removeEdge(*i, *j);
+        }
+    }
 }
 
-void Graph::removeAllEdgesOfNode(std::shared_ptr<Node> node){}
+void Graph::removeAllEdgesOfNode(std::shared_ptr<Node> node){
+    for (auto& it : nodes) {
+        removeEdge(node, it);
+    }
+}
 void Graph::addNode(const TDT4102::Point location, std::string label){
     nodes.emplace_back(std::make_shared<Node>(location, label));
 }
