@@ -6,7 +6,6 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <stdio.h>
 
 #include "AnimationWindow.h"
 #include "exception.h"
