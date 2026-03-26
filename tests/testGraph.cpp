@@ -1,7 +1,7 @@
 #include "tests/include/testGraph.h"
 
 void TestGraph::testLoad() {
-    try {
+    // try {
     Graph g1;
     Graph g2("tests/adjacencylist.adj");
     // Graph g3("tests/edgeList.edg");
@@ -27,11 +27,21 @@ void TestGraph::testLoad() {
         std::cout << "testLoad passed\n";
     }
 
-    }
-    catch (...) {
-        std::cerr << "exception encountered\n";
-        return;
-    }
+    // }
+    // catch (BadFormat e) {
+    //     std::cerr << "Exception thrown " << e.what() << std::endl;
+    //     return;
+    // }
+    // catch (std::length_error e) {
+    //     std::cerr << "Exception thrown " << e.what() << std::endl;
+    // }
+    // catch (FileNotOpen e) {
+    //     std::cerr << "Exception thrown " << e.what() << std::endl;
+    // }
+    // catch (...) {
+    //     std::cerr << "unknown exception thrown";
+    // }
+    
 }
 
 void TestGraph::testSave(){

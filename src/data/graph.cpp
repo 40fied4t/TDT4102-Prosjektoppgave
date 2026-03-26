@@ -225,26 +225,30 @@ void Graph::loadFromAdj(std::filesystem::path fileName){
     //generer referansestrukturer for generering av graf
     std::string key;
     std::string val;
+    std::string valString;
+
     char delim;
     std::unordered_map<std::string, std::vector<std::string>> labelMap;
     try{
-    while (inputStream) {
-        inputStream >> key;
+    while (inputStream >> key) {
         inputStream >> delim;
 
         for (auto &it : labelVec) {
             if (it == key) {
-                std::cerr << "badFormat\n";
+                std::cerr << "Already in vector\n";
                 throw BadFormat();
             }
         }
         labelVec.push_back(key);
 
         if (delim != ':') {
+            std::cerr << "dårlig delim\n";
             throw BadFormat();
         }
-        while (inputStream >> val) {
-            if (val == "\n" || val == "\r\n" || val == "\r") {break;}
+        std::getline(inputStream, valString);
+
+        std::stringstream ss{valString};
+        while (ss >> val) {
             labelMap[key].push_back(val);
         }
     }
@@ -256,8 +260,7 @@ void Graph::loadFromAdj(std::filesystem::path fileName){
     std::vector<TDT4102::Point> positionVec = generatePositions(labelVec.size());
     //Avbryt dersom 
     if (labelMap.size() != positionVec.size() || positionVec.size() != labelVec.size()) {
-        std::cout << labelMap.size() << " " << positionVec.size() << " " << labelVec.size() << std::endl;
-        std::cerr << "badFormat\n";
+        std::cout << "size error" << labelMap.size() << " " << positionVec.size() << " " << labelVec.size() << std::endl;
         throw BadFormat();
         return;
     }
@@ -269,7 +272,7 @@ void Graph::loadFromAdj(std::filesystem::path fileName){
     updateNextLabel();
     //generer kanter
     for (auto i = labelVec.begin(); i != labelVec.end(); ++i) {
-        for (auto j = i +1; j != labelVec.end(); ++i) {
+        for (auto j = i +1; j != labelVec.end(); ++j) {
             bool iToj = leadsTo<std::string>(labelMap, *i, *j);
             bool jToi = leadsTo<std::string>(labelMap, *j, *i);
 
@@ -286,7 +289,25 @@ void Graph::loadFromAdj(std::filesystem::path fileName){
     }
 }
 void Graph::loadFromEdg(std::filesystem::path fileName){
-    
+    std::ifstream inputStream{fileName};
+    try {
+        if (!inputStream) {
+            throw FileNotOpen{fileName};
+        }
+        if (fileName.extension() != std::filesystem::path(".edg")) {
+            throw WrongFileExtension{fileName, std::filesystem::path(".edg")};
+        }
+    }
+    catch (FileNotOpen e){
+        std::cerr << e.what() << " " << e.getPath() << std::endl;
+        return;
+    }
+    catch (WrongFileExtension e) {
+        std::cerr << e.what() << "\nforventet: " << e.getExtension() << "\nfikk: " << e.getPath() << std::endl;
+        return;
+    }
+
+
 }
 
 void Graph::saveToAdj(std::filesystem::path fileName){
