@@ -381,6 +381,21 @@ void Graph::saveToEdg(std::filesystem::path fileName){
     std::ofstream outputStream{fileName};
 
     for (auto& it : edgeVec) {
-    
+        //hvis Edge
+        if (it -> getDelim() == '-') {
+            outputStream << 
+            it -> getFrom()[0] -> getLabel() << " " << 
+            it -> getDelim() <<
+            it -> getFrom()[1] -> getLabel() << " " <<
+            it -> getWeight() << "\n";
+        }
+        //hvis DirectionalEdge
+        else if (it -> getDelim() == '>') {
+            outputStream << 
+            it -> getFrom()[0] -> getLabel() << " " << 
+            it -> getDelim() <<
+            it -> getTo()[0] -> getLabel() << " " <<
+            it -> getWeight() << "\n";
+        }
     }
 }
