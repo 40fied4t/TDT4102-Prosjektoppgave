@@ -143,7 +143,7 @@ void Graph::removeEdge(std::shared_ptr<Node> first, std::shared_ptr<Node> second
     //Fjerner kanten fra edgeVec
     bool firstFound = false;
     bool secondFound = false;
-    
+
     //Fjerner kanten fra graphMap
 }
 
@@ -219,7 +219,10 @@ Graph::Graph(std::filesystem::path fileName)
         std::cerr << "File does not have correct format extension";
     }
 }
-Graph::~Graph(){}
+Graph::~Graph(){
+    empty();
+    labelVec.clear();
+}
 
 void Graph::loadFromAdj(std::filesystem::path fileName){
     std::ifstream inputStream{fileName};
