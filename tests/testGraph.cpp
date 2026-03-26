@@ -49,6 +49,7 @@ void TestGraph::testSave(){
     Graph g2("tests/edgeList.edg");
 
     g1.saveToAdj("tests/output/adjacencylist.adj");
+    g2.resetLabels();
     g2.saveToEdg("tests/output/edgeList.edg");
 
     std::cout << "testSave kjørt, sjekk output\n";
