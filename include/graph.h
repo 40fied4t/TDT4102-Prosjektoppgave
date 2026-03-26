@@ -36,6 +36,7 @@ public:
     
     virtual std::vector<std::shared_ptr<Node>> getTo() const;
     virtual std::vector<std::shared_ptr<Node>> getFrom() const;
+    virtual char getDelim(){return '-';}
     int getWeight() const;
 
     Edge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight);
@@ -48,7 +49,7 @@ class DirectionalEdge : public Edge
 public:
     virtual std::vector<std::shared_ptr<Node>> getTo() const override;
     virtual std::vector<std::shared_ptr<Node>> getFrom() const override;
-
+    virtual char getDelim() override {return '>';}
     DirectionalEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight);
     DirectionalEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to);
 };

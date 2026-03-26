@@ -364,6 +364,23 @@ void Graph::loadFromEdg(std::filesystem::path fileName){
 }
 
 void Graph::saveToAdj(std::filesystem::path fileName){
+    std::ofstream outputStream{fileName};
+
+    for (auto& it : graphMap) {
+        std::shared_ptr<Node> keyNode = std::get<0>(it);
+        std::vector<std::shared_ptr<Node>> valNodeVec = std::get<1>(it);
+
+        outputStream << keyNode -> getLabel() << " :";
+        for (auto& valNode : valNodeVec) {
+            outputStream << " " << valNode -> getLabel();
+        }
+        outputStream << "\n";
+    }
 }
 void Graph::saveToEdg(std::filesystem::path fileName){
+    std::ofstream outputStream{fileName};
+
+    for (auto& it : edgeVec) {
+    
+    }
 }
