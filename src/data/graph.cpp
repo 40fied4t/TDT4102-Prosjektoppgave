@@ -139,7 +139,14 @@ void Graph::addSelectedEdges(const int weight){
     }
 }
 
-void Graph::removeEdge(std::shared_ptr<Node> first, std::shared_ptr<Node> second) {}
+void Graph::removeEdge(std::shared_ptr<Node> first, std::shared_ptr<Node> second) {
+    //Fjerner kanten fra edgeVec
+    bool firstFound = false;
+    bool secondFound = false;
+    
+    //Fjerner kanten fra graphMap
+}
+
 void Graph::removeSelectedEdges(){
 }
 
