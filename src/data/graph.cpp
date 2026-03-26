@@ -223,9 +223,10 @@ void Graph::loadFromAdj(std::filesystem::path fileName){
     }
 
     //generer referansestrukturer for generering av graf
+    labelVec.clear();
     std::string key;
     std::string val;
-    std::string valString;
+    std::string line;
 
     char delim;
     std::unordered_map<std::string, std::vector<std::string>> labelMap;
@@ -245,9 +246,9 @@ void Graph::loadFromAdj(std::filesystem::path fileName){
             std::cerr << "dårlig delim\n";
             throw BadFormat();
         }
-        std::getline(inputStream, valString);
+        std::getline(inputStream, line);
 
-        std::stringstream ss{valString};
+        std::stringstream ss{line};
         while (ss >> val) {
             labelMap[key].push_back(val);
         }
@@ -307,15 +308,62 @@ void Graph::loadFromEdg(std::filesystem::path fileName){
         return;
     }
 
+    std::string firstLabel;
+    char edge;
+    std::string secondLabel;
+    int weight;
 
+    struct LabelEdge {
+        std::string firstLabel;
+        std::string secondLabel;
+        int edge;
+        int weight;
+    };
+    std::vector<LabelEdge> labelEdgeVec;
+    labelVec.clear();
+
+    while (inputStream >> firstLabel >> edge >> secondLabel >> weight) {
+        if (edge != '-' || edge != '<' || edge != '>') {
+            throw BadFormat();
+            return;
+        }
+        if (std::find(labelVec.begin(), labelVec.end(), firstLabel) == labelVec.end()){  
+            labelVec.push_back(firstLabel);
+        }
+        else if (std::find(labelVec.begin(), labelVec.end(), secondLabel) == labelVec.end()){  
+            labelVec.push_back(secondLabel);
+        }
+        labelEdgeVec.emplace_back(LabelEdge{firstLabel, secondLabel, edge, weight});
+    }
+
+    std::vector<TDT4102::Point> positionVec = generatePositions(labelVec.size());
+    //Avbryt dersom 
+    if (positionVec.size() != labelVec.size()) {
+        std::cout << "size error " << positionVec.size() << " " << labelVec.size() << std::endl;
+        throw BadFormat();
+        return;
+    }
+    //tøm graf og generer nye noder
+    empty();
+    for (int i = 0; i < labelVec.size(); ++i) {
+        addNode(positionVec[i], labelVec[i]);
+    }
+    updateNextLabel();
+    //generer kanter
+    for (auto& it : labelEdgeVec) {
+        if (it.edge == '-') {
+            addEdge(getNode(it.firstLabel), getNode(it.secondLabel), it.weight);
+        }
+        else if (it.edge == '>') {
+            addDirectionalEdge(getNode(it.firstLabel), getNode(it.secondLabel), it.weight);
+        }
+        else if (it.edge == '<') {
+            addDirectionalEdge(getNode(it.firstLabel), getNode(it.secondLabel), it.weight);
+        }
+    }
 }
 
 void Graph::saveToAdj(std::filesystem::path fileName){
-
 }
 void Graph::saveToEdg(std::filesystem::path fileName){
-    graphMap.clear();
-    edgeVec.clear();
-    nodes.clear();
-    selectedNodes.clear();
 }
