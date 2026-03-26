@@ -121,22 +121,15 @@ void Graph::addSelectedEdges(const int weight){
     }
 }
 
-void Graph::removeEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to) {}
+void Graph::removeEdge(std::shared_ptr<Node> first, std::shared_ptr<Node> second) {}
 void Graph::removeSelectedEdges(){
-    #define rmSelEd
-
-    #ifndef rmSelEd
-
-    #endif
-
-    return;
 }
 
-void Graph::removeAllEdgesToNode(std::shared_ptr<Node> node){}
+void Graph::removeAllEdgesOfNode(std::shared_ptr<Node> node){}
 void Graph::addNode(const TDT4102::Point location, std::string label){
     nodes.emplace_back(std::make_shared<Node>(location, label));
 }
-void Graph::removeNode(){}
+void Graph::removeNode(std::shared_ptr<Node> node){}
 void Graph::removeSelectedNodes(){}
 int Graph::getSize() const {
     return nodes.size();
