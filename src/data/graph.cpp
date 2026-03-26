@@ -323,7 +323,8 @@ void Graph::loadFromEdg(std::filesystem::path fileName){
     labelVec.clear();
 
     while (inputStream >> firstLabel >> edge >> secondLabel >> weight) {
-        if (edge != '-' || edge != '<' || edge != '>') {
+        if (!(edge == '-' || edge == '<' || edge == '>')) {
+            std::cout << edge << std::endl;
             throw BadFormat();
             return;
         }
@@ -358,7 +359,7 @@ void Graph::loadFromEdg(std::filesystem::path fileName){
             addDirectionalEdge(getNode(it.firstLabel), getNode(it.secondLabel), it.weight);
         }
         else if (it.edge == '<') {
-            addDirectionalEdge(getNode(it.firstLabel), getNode(it.secondLabel), it.weight);
+            addDirectionalEdge(getNode(it.secondLabel), getNode(it.firstLabel), it.weight);
         }
     }
 }
@@ -384,16 +385,14 @@ void Graph::saveToEdg(std::filesystem::path fileName){
         //hvis Edge
         if (it -> getDelim() == '-') {
             outputStream << 
-            it -> getFrom()[0] -> getLabel() << " " << 
-            it -> getDelim() <<
+            it -> getFrom()[0] -> getLabel() << " - " <<
             it -> getFrom()[1] -> getLabel() << " " <<
             it -> getWeight() << "\n";
         }
         //hvis DirectionalEdge
         else if (it -> getDelim() == '>') {
             outputStream << 
-            it -> getFrom()[0] -> getLabel() << " " << 
-            it -> getDelim() <<
+            it -> getFrom()[0] -> getLabel() << " > " <<
             it -> getTo()[0] -> getLabel() << " " <<
             it -> getWeight() << "\n";
         }
