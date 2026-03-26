@@ -19,7 +19,7 @@ private:
     std::string label;                  ///< Nodens navn.
     bool selected = false;              ///< Bool som viser om noden er valgt.
     TDT4102::Point  location;           ///< Nodens lokasjon som Point, til bruk i visualsering.
-
+public:
     /// @brief Klassens konsturktør.
     /// @param location Lokasjonen noden skal konstruerer på.
     /// @param label Navnet noden skal konstrueres med
@@ -43,8 +43,6 @@ private:
 
     /// @brief Tilegner selected = !selected.
     void updateSelect();
-public:
-    friend class Graph;
 };
 
 /// @brief Klasse som representerer kantene i nettverket.
@@ -60,7 +58,7 @@ protected:
     /// @note Implementert som vektor med to elementer, men støtter større lengder, men dette støttes ikke av implementert filformat.
     /// @warning Medlemsklasser slik som DirectionalEdge kan avhenge av at vektoren har en gitt struktur f.eks. {from, to}.
     std::vector<std::shared_ptr<Node>> nodeVec;
-
+public:
     /// @brief Gir hvilke noder som kan nåes av kanten.
     /// @return nodeVec
     virtual std::vector<std::shared_ptr<Node>> getTo() const;
@@ -81,8 +79,6 @@ protected:
     /// @param weight Legges til som weight, settes til 1 dersom annet ikke oppgis
     Edge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight);
     Edge(std::shared_ptr<Node> from, std::shared_ptr<Node> to);
-public:
-    friend class Graph;
 };
 
 /// @brief Medlem av Edge som kun går én vei.
