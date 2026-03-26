@@ -136,6 +136,8 @@ public:
     /// @brief Finner neste heltallsnavn som ikke er tatt i bruk og oppdaterer nextLabel.
     void updateNextLabel();
 
+    void resetLabels();
+
     /// @brief Legger til urettet kant mellom to noder.
     /// @param from Den første noden.
     /// @param to Den andre noden.

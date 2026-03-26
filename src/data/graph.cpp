@@ -73,12 +73,18 @@ void Graph::updateSelectedNodes(){
     }
 }
 void Graph::updateNextLabel(){
-    #define nextlabel
-
-    #ifndef nextlebel
-
-    #endif
-    return;
+    int labelInt = 1;
+    auto it = labelVec.begin();
+    while (it != labelVec.end()) {
+        if (*it == std::to_string(labelInt)) {
+            labelInt++;
+            it = labelVec.begin();
+        }
+        else {
+            it++;
+        }
+    }
+    nextLabel = std::to_string(labelInt);
 }
 
 void Graph::addEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight){
