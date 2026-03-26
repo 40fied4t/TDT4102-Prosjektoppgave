@@ -59,6 +59,9 @@ protected:
     /// @warning Medlemsklasser slik som DirectionalEdge kan avhenge av at vektoren har en gitt struktur f.eks. {from, to}.
     std::vector<std::shared_ptr<Node>> nodeVec;
 public:
+    /// @brief Gir nodeVec
+    /// @return nodeVec
+    const std::vector<std::shared_ptr<Node>> getNodeVec() const {return nodeVec;}
     /// @brief Gir hvilke noder som kan nåes av kanten.
     /// @return nodeVec
     virtual std::vector<std::shared_ptr<Node>> getTo() const;
