@@ -9,13 +9,14 @@ class GraphWindow : public TDT4102::AnimationWindow, public Graph
 {
 private:
     //========================= Constants
-    static constexpr int bufW = 20;
-    static constexpr int bufH = 20;
-    static constexpr int btnH = 20;
-    static constexpr int btnW = 20;
+    static constexpr int bufW = 30;
+    static constexpr int bufH = 30;
+    
+    static constexpr int btnW = 100;
+    static constexpr int btnH = 50;
 
-    static constexpr int fieldW = 100;
-    static constexpr int fieldH = 20;
+    static constexpr int fieldW = 200;
+    static constexpr int fieldH = 50;
 
     static constexpr int radius = 50;
 
@@ -32,6 +33,7 @@ private:
 
     TDT4102::Button loadButton;
     TDT4102::Button saveButton;
+    TDT4102::Button changeMenuButton;
 
     TDT4102::TextInput fileInput;
 
@@ -65,5 +67,6 @@ public:
     //========================= Buttons
     void loadButtonCallback();
     void saveButtonCallback();
+    void changeMenuCallback();
     
 };

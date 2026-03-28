@@ -5,32 +5,40 @@ GraphWindow::GraphWindow():
     AnimationWindow(50, 50, Graph::width, Graph::height, "Grafvisualisering"),
 
 
-    loadButton{TDT4102::Point{100,100}, btnW, btnH, "load"},
-    saveButton{TDT4102::Point{100, 200}, btnW, btnH, "save"},
+    loadButton{TDT4102::Point{bufW,50}, btnW, btnH, "load"},
+    saveButton{TDT4102::Point{bufW, 100}, btnW, btnH, "save"},
+    changeMenuButton{TDT4102::Point{Graph::width - bufW - btnW, bufH}, btnW, btnH, "change"},
 
-    fileInput{TDT4102::Point{100, 300}, fieldW, fieldH, "filename"}
+    fileInput{TDT4102::Point{bufW, 150}, fieldW, fieldH, "filename"}
     {
     loadButton.setCallback(std::bind(&GraphWindow::loadButtonCallback, this));
     saveButton.setCallback(std::bind(&GraphWindow::saveButtonCallback, this));
+    changeMenuButton.setCallback(std::bind(&GraphWindow::changeMenuCallback, this));
 
     add(loadButton);
     add(saveButton);
+    add(changeMenuButton);
+    add(fileInput);
 }
 
 GraphWindow::GraphWindow(std::filesystem::path fileName):
     Graph(fileName),
     AnimationWindow(50, 50, Graph::width, Graph::height, "Grafvisualisering"),
 
-    loadButton{TDT4102::Point{100,100}, btnW, btnH, "load"},
-    saveButton{TDT4102::Point{100, 200}, btnW, btnH, "save"},
+    loadButton{TDT4102::Point{bufW,100}, btnW, btnH, "load"},
+    saveButton{TDT4102::Point{bufW, 200}, btnW, btnH, "save"},
+    changeMenuButton{TDT4102::Point{Graph::width - bufW - btnW, bufH}, btnW, btnH, "change"},
 
-    fileInput{TDT4102::Point{100, 300}, fieldW, fieldH, "filename"}
+    fileInput{TDT4102::Point{bufW, 300}, fieldW, fieldH, "filename"}
     {
     loadButton.setCallback(std::bind(&GraphWindow::loadButtonCallback, this));
     saveButton.setCallback(std::bind(&GraphWindow::saveButtonCallback, this));
+    changeMenuButton.setCallback(std::bind(&GraphWindow::changeMenuCallback, this));
 
     add(loadButton);
     add(saveButton);
+    add(changeMenuButton);
+    add(fileInput);
 }
 
 void GraphWindow::run() {
@@ -48,13 +56,13 @@ void GraphWindow::run() {
                 saveButton.setVisible(false);
                 fileInput.setVisible(false);
                 drawMain();
-                // next_frame();
+                next_frame();
                 break;
             case closed:
                 close();
                 break;
             default:
-                std::cerr << "wrong Currstate";
+                std::cerr << "wrong Currstate\n";
                 close();
         }
     }
@@ -66,7 +74,6 @@ void GraphWindow::drawMain() {
 }
 
 void GraphWindow::drawMenu() {
-    currState = main;
 }
 
 std::shared_ptr<Node>& GraphWindow::getNode(const TDT4102::Point& location) {
@@ -128,13 +135,13 @@ void GraphWindow::loadButtonCallback(){
 void GraphWindow::saveButtonCallback(){
     std::filesystem::path fileName = fileInput.getText();
 
-    if (!fileName.has_extension()) {
-        fileName.replace_extension(".adj");
-        saveToAdj(fileName);
-        fileName.replace_extension(".edg");
-        saveToEdg(fileName);
-    }
-    else if (fileName.extension() == ".adj") {
+    // if (!fileName.has_extension()) {
+    //     fileName.replace_extension(".adj");
+    //     saveToAdj(fileName);
+    //     fileName.replace_extension(".edg");
+    //     saveToEdg(fileName);
+    // }
+    if (fileName.extension() == ".adj") {
         saveToAdj(fileName);
     }
     else if (fileName.extension() == ".edg") {
@@ -142,5 +149,16 @@ void GraphWindow::saveButtonCallback(){
     }
     else {
         /*Kanskje vis melding?*/
+    }
+}
+
+void GraphWindow::changeMenuCallback() {
+    switch (currState) {
+        case main:
+            currState = menu;
+            break;
+        case menu:
+            currState = main;
+            break;
     }
 }
