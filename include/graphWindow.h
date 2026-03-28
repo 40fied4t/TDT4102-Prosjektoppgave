@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 #include "include/graph.h"
 #include "widgets/Button.h"
 #include "widgets/TextInput.h"
@@ -33,19 +35,32 @@ private:
 
     TDT4102::TextInput fileInput;
 
+    //========================= Colors
+
+    TDT4102::Color nodeColor = TDT4102::Color::purple;
+    TDT4102::Color unselectedBorderColor = TDT4102::Color::transparent;
+    TDT4102::Color selectedBorderColor = TDT4102::Color::blue_violet;
+    TDT4102::Color unselectedEdgeColor = TDT4102::Color::black;
+    TDT4102::Color selectedEdgeColor = TDT4102::Color::blue;
 public:
     //========================= Init
+
     GraphWindow();
     GraphWindow(std::filesystem::path fileName);
-    ~GraphWindow();
-    
     void run();
+    //========================= Get
+
+    std::shared_ptr<Node>& getNode(const TDT4102::Point& location);
+    double getDistance(const TDT4102::Point& loc1, const TDT4102::Point& loc2);
     //========================= Draw
     void drawMenu();
     void drawMain();
 
     void drawNode(const std::shared_ptr<Node>& node);
-    void drawEdge(const std::unique_ptr<Edge>& edge);
+    void drawEdge(const TDT4102::Point& startPoint, const TDT4102::Point& endPoint, const bool selected);
+
+    void drawAllNodes();
+    void drawAllEdges();
 
     //========================= Buttons
     void loadButtonCallback();

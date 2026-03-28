@@ -102,7 +102,7 @@ void Graph::removeEdge(std::shared_ptr<Node> first, std::shared_ptr<Node> second
                     edgeVec.begin(),
                     edgeVec.end(),
                     //Benytter lambdafunksjon som predikat
-                    [&] (std::unique_ptr<Edge> const& p)
+                    [&] (std::shared_ptr<Edge> const& p)
                         {   // Predikatet sjekker om de peker til samme underliggende Edge
                         return p == it;
                     }),
@@ -232,7 +232,7 @@ std::vector<TDT4102::Point> Graph::generatePositions(const int& n) {
 Graph::Graph()
 {
     graphMap = std::unordered_map<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>>();
-    edgeVec = std::vector<std::unique_ptr<Edge>>();
+    edgeVec = std::vector<std::shared_ptr<Edge>>();
     nodes = std::vector<std::shared_ptr<Node>>();
     selectedNodes = std::vector<std::shared_ptr<Node>>();
     addNode({width/2, height/2}, nextLabel);
@@ -241,7 +241,7 @@ Graph::Graph()
 Graph::Graph(std::filesystem::path fileName)
 {
     graphMap = std::unordered_map<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>>();
-    edgeVec = std::vector<std::unique_ptr<Edge>>();
+    edgeVec = std::vector<std::shared_ptr<Edge>>();
     nodes = std::vector<std::shared_ptr<Node>>();
     selectedNodes = std::vector<std::shared_ptr<Node>>();
 

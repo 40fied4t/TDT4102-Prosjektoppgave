@@ -16,6 +16,8 @@ protected:
     /// @note Implementert som vektor med to elementer, men støtter større lengder, men dette støttes ikke av implementert filformat.
     /// @warning Medlemsklasser slik som DirectionalEdge kan avhenge av at vektoren har en gitt struktur f.eks. {from, to}.
     std::vector<std::shared_ptr<Node>> nodeVec;
+
+    bool selected = false;
 public:
     /// @brief Gir nodeVec
     /// @return nodeVec
@@ -40,6 +42,9 @@ public:
     /// @param weight Legges til som weight, settes til 1 dersom annet ikke oppgis
     Edge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight);
     Edge(std::shared_ptr<Node> from, std::shared_ptr<Node> to);
+
+    void setSelect(const bool truthVal) {selected = truthVal;}
+    bool getSelect() const {return selected;}
 };
 
 /// @brief Medlem av Edge som kun går én vei.

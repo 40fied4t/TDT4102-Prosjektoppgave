@@ -22,13 +22,13 @@ class Graph
 private:
     std::string nextLabel = "1";     ///< Navnet som blir gitt neste genererte node.
     std::vector<std::string> labelVec;  ///< Referansevektor for opptatte navn.
-
+protected:
     /// @brief Oppslagsverk for hvor en node fører.
     /// @details Dersom en node from leder til en annen node to, inneholder graphMap[from] to.
     std::unordered_map<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>> graphMap;
 
-    /// @brief Vektor med unique_ptr til alle kantene grafen inneholder.
-    std::vector<std::unique_ptr<Edge>> edgeVec;
+    /// @brief Vektor med shared_ptr til alle kantene grafen inneholder.
+    std::vector<std::shared_ptr<Edge>> edgeVec;
 
     /// @brief Vektor med shared_ptr til alle kanter grafen inneholder.
     std::vector<std::shared_ptr<Node>> nodes;
@@ -36,7 +36,7 @@ private:
     /// @brief Vektor med shared_ptr til valgte noder.
     /// @note Oppdateres via updateSelectedNodes(), og funksjoner som kaller denne.
     std::vector<std::shared_ptr<Node>> selectedNodes;
-protected:
+
     static constexpr int width = 1024;  ///< Vinduets bredde.
     static constexpr int height = 768;  ///< Vinduets høyde.
 public:

@@ -40,6 +40,8 @@ public:
 
     /// @brief Tilegner selected = !selected.
     void updateSelect() {selected = !selected;}
+
+    void setSelect(const bool truthVal) {selected = truthVal;}
 };
 
 
