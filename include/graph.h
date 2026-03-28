@@ -99,7 +99,7 @@ public:
     /// @return '>'
     virtual char getDelim() override {return '>';}
 
-    /// @brief Klassens kontruktør. 
+    /// @brief Klassens konstruktør. 
     /// @param from Legges til som den første noden i nodeVec
     /// @param to Legges til som den andre noden i nodeVec
     /// @param weight Legges til som weight, settes til 1 dersom annet ikke oppgis
@@ -115,14 +115,11 @@ public:
 class Graph
 {
 private:
-    static constexpr int width = 1000;  ///< Vinduets bredde.
-    static constexpr int height = 500;  ///< Vinduets høyde.
-
     std::string nextLabel = "1";     ///< Navnet som blir gitt neste genererte node.
     std::vector<std::string> labelVec;  ///< Referansevektor for opptatte navn.
 
-    /// @brief Oppslagsverk for hvor en node fører
-    /// Dersom en node from leder til en annen node to, inneholder graphMap[from] to.
+    /// @brief Oppslagsverk for hvor en node fører.
+    /// @details Dersom en node from leder til en annen node to, inneholder graphMap[from] to.
     std::unordered_map<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>> graphMap;
 
     /// @brief Vektor med unique_ptr til alle kantene grafen inneholder.
@@ -134,11 +131,13 @@ private:
     /// @brief Vektor med shared_ptr til valgte noder.
     /// @note Oppdateres via updateSelectedNodes(), og funksjoner som kaller denne.
     std::vector<std::shared_ptr<Node>> selectedNodes;
-
-
+protected:
+    static constexpr int width = 1024;  ///< Vinduets bredde.
+    static constexpr int height = 768;  ///< Vinduets høyde.
 public:
+
     /// @brief Oppdaterer selectedNodes
-    /// Kaller selectedNodes.clear(), og legger så til noder fra nodes der Node::isSelected() == true.
+    /// @details Kaller selectedNodes.clear(), og legger så til noder fra nodes der Node::isSelected() == true.
     void updateSelectedNodes();
     /// @brief Finner neste heltallsnavn som ikke er tatt i bruk og oppdaterer nextLabel.
     void updateNextLabel();
@@ -227,7 +226,7 @@ public:
 
     /// @brief Konstruktør for klassen fra en fil, med format ".adj"/".edg".
     /// @param fileName Filsti for filen klassen skal lastes inn fra.
-    /// Bruker henholdsvis loadFromAdj eller loadFromEdg avhengig av hvilken filtype konstruktøren kalles med.
+    /// @details Bruker henholdsvis loadFromAdj eller loadFromEdg avhengig av hvilken filtype konstruktøren kalles med.
     Graph(std::filesystem::path fileName);
     /// @brief Klassens dekstruktør.
     ~Graph();
@@ -236,17 +235,17 @@ public:
     /// @param fileName Filsti, må være .adj fil.
     /// @note Endrer ikke på grafen dersom det er feil ved filformat, eller filen ikke er en .adj fil.
     /// @attention Erstatter den nåverende grafstrukturen, ved bruk av empty().
-    /// Hver linje i .adj fil skal være formatert som en node etterfulgt av nodene man kan nå via noden eksempelvis: node : node1 node2 node3.
+    /// @details Hver linje i .adj fil skal være formatert som en node etterfulgt av nodene man kan nå via noden eksempelvis: node : node1 node2 node3.
     /// Alle nodene ha sin egen linje i listen, og være etterfulgt av kolon. Videre er navnet på nodene formatert som streng, og kan ikke inneholde mellomrom.
     void loadFromAdj(std::filesystem::path fileName);
 
     /// @brief Laster inn graftstruktur som (litt modifisert) edge list fra .edg fil, med vekting av kanter.
     /// @param fileName Filsti, må være .edg fil.
-    /// Hver line i i .edg fil skal være formatert som to noder, med type kant imellom dem, etterfulgt av vekting.
-    /// Eksempelvis:
-    ///     node1 - node2 1
-    ///     node1 > node3 2 
-    ///     node2 < node3 3
+    /// @details Hver line i i .edg fil skal være formatert som to noder, med type kant imellom dem, etterfulgt av vekting.
+    /// Eksempelvis:\n
+    ///     node1 - node2 1 \n
+    ///     node1 > node3 2 \n
+    ///     node2 < node3 3 \n
     /// Dette gir en urettet kant mellom node1 og node2 med vekting 1, en rettet kant fra node1 til node3 med vekting 2, og en rettet kant fra node3 til node2 med vekting 3.
     /// @note Merk at det kun kan eksistere én kant mellom to gitte noder slik grafen er implementert. Dermed vil linjer som legger til kanter mellom to noder som allerede har en kant ikke gjøre noe.
     void loadFromEdg(std::filesystem::path fileName);

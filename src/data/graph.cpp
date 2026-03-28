@@ -210,8 +210,50 @@ void Graph::removeAllEdgesOfNode(std::shared_ptr<Node> node){
 void Graph::addNode(const TDT4102::Point location, std::string label){
     nodes.emplace_back(std::make_shared<Node>(location, label));
 }
-void Graph::removeNode(std::shared_ptr<Node> node){}
-void Graph::removeSelectedNodes(){}
+void Graph::removeNode(const std::shared_ptr<Node> node){
+    
+    removeAllEdgesOfNode(node);
+
+    graphMap.erase(node);
+
+    nodes.erase(
+        std::remove(
+            nodes.begin(),
+            nodes.end(),
+            node),
+        nodes.end()
+        );
+
+    labelVec.erase(
+        std::remove(
+            labelVec.begin(),
+            labelVec.end(),
+            node -> getLabel()),
+        labelVec.end()
+        );
+
+    selectedNodes.erase(
+        std::remove(
+            selectedNodes.begin(),
+            selectedNodes.end(),
+            node),
+        selectedNodes.end()
+        );
+
+    updateNextLabel();
+
+    if (node.use_count() > 1){
+        std::cerr << "Did not remove all instances of node\n";
+    }
+}
+void Graph::removeSelectedNodes(){
+    updateSelectedNodes();
+
+    while (std::shared_ptr<Node> node = selectedNodes.back()) {
+        selectedNodes.pop_back();
+        removeNode(node);
+    }
+}
 int Graph::getSize() const {
     return nodes.size();
 }
