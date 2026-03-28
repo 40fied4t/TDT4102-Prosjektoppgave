@@ -26,7 +26,7 @@ private:
         main,
         closed
     };
-    WindowState currState = menu;
+    WindowState currState = main;
 
     //========================= Buttons
 

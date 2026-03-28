@@ -37,8 +37,18 @@ void GraphWindow::run() {
     while(!should_close()){
         switch (currState) {
             case menu:
+                loadButton.setVisible(true);
+                saveButton.setVisible(true);
+                fileInput.setVisible(true);
+                drawMenu();
+                next_frame();
                 break;
             case main:
+                loadButton.setVisible(false);
+                saveButton.setVisible(false);
+                fileInput.setVisible(false);
+                drawMain();
+                // next_frame();
                 break;
             case closed:
                 close();
@@ -51,11 +61,12 @@ void GraphWindow::run() {
 }
 
 void GraphWindow::drawMain() {
-    
+    drawAllEdges();
+    drawAllNodes();
 }
 
 void GraphWindow::drawMenu() {
-
+    currState = main;
 }
 
 std::shared_ptr<Node>& GraphWindow::getNode(const TDT4102::Point& location) {
@@ -87,8 +98,49 @@ void GraphWindow::drawAllNodes(){
         drawNode(it);
     }
 }
-void GraphWindow::drawAllEdges(){}
+void GraphWindow::drawAllEdges(){
+    for (const auto& it : edgeVec) {
+        for (const auto& from : it -> getFrom()) {
+            for (const auto& to : it -> getTo()) {
+                if (from != to) {
+                    drawEdge(from -> getLocation(), to -> getLocation(), it -> getSelect());
+                }
+            }
+        }
+    }
+}
 
 
-void GraphWindow::loadButtonCallback(){}
-void GraphWindow::saveButtonCallback(){}
+void GraphWindow::loadButtonCallback(){
+    std::filesystem::path fileName = fileInput.getText();
+
+
+    if (fileName.extension() == ".adj") {
+        loadFromAdj(fileName);
+    }
+    else if (fileName.extension() == ".edg") {
+        loadFromEdg(fileName);
+    }
+    else {
+        /*Kanskje vis en melding?*/
+    }
+}
+void GraphWindow::saveButtonCallback(){
+    std::filesystem::path fileName = fileInput.getText();
+
+    if (!fileName.has_extension()) {
+        fileName.replace_extension(".adj");
+        saveToAdj(fileName);
+        fileName.replace_extension(".edg");
+        saveToEdg(fileName);
+    }
+    else if (fileName.extension() == ".adj") {
+        saveToAdj(fileName);
+    }
+    else if (fileName.extension() == ".edg") {
+        saveToEdg(fileName);
+    }
+    else {
+        /*Kanskje vis melding?*/
+    }
+}
