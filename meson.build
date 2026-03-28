@@ -11,7 +11,7 @@ std_lib_facilities_dep = dependency('std_lib_facilities', fallback: ['std_lib_fa
 compiler_flags = ['-Wconversion', '-fdiagnostics-color=always', '-Werror=return-type', '-static']
 
 src = ['src/bin/main.cpp',
-'src/data/graph.cpp',
+'src/data/graph.cpp', 'src/data/edge.cpp',
 'src/scripts/graphWindow.cpp',
 'tests/testGraph.cpp', 'tests/testGraphWindow.cpp']
 
