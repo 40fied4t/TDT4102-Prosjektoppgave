@@ -4,6 +4,10 @@ build
 .vscode
 relevanteØvinger
 
+# Annet
+dokumentasjon
+Doxyfile
+
 # Prerequisites
 *.d
 
