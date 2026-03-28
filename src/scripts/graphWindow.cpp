@@ -55,6 +55,7 @@ void GraphWindow::run() {
                 loadButton.setVisible(false);
                 saveButton.setVisible(false);
                 fileInput.setVisible(false);
+                updateMain();
                 drawMain();
                 next_frame();
                 break;
@@ -68,6 +69,33 @@ void GraphWindow::run() {
     }
 }
 
+void GraphWindow::updateMain() {
+    TDT4102::Point currMouseLocation = get_mouse_coordinates();
+    TDT4102::Point deltaMouseMovement = currMouseLocation - lastMouseLocation;
+    
+    if (std::shared_ptr<Node> hoveredNode{getNode(currMouseLocation)}) {
+        while (is_left_mouse_button_down()) {
+            hoveredNode -> setLocation(hoveredNode -> getLocation() + deltaMouseMovement);
+            drawMain();
+            next_frame();
+
+            lastMouseLocation = currMouseLocation;
+            currMouseLocation = get_mouse_coordinates();
+            deltaMouseMovement = currMouseLocation - lastMouseLocation;
+        }
+
+        if (is_right_mouse_button_down() && !rightMouseButtonClick) {
+            hoveredNode -> updateSelect();
+            rightMouseButtonClick = true;
+        }
+        else if (!is_right_mouse_button_down()) {
+            rightMouseButtonClick = false;
+        }
+    }
+
+    lastMouseLocation = currMouseLocation;
+}
+
 void GraphWindow::drawMain() {
     drawAllEdges();
     drawAllNodes();
@@ -76,14 +104,19 @@ void GraphWindow::drawMain() {
 void GraphWindow::drawMenu() {
 }
 
-std::shared_ptr<Node>& GraphWindow::getNode(const TDT4102::Point& location) {
-    return *std::find_if(
+std::shared_ptr<Node> GraphWindow::getNode(const TDT4102::Point& location) {
+    auto p = find_if(
         nodes.begin(),
         nodes.end(),
         [&] (std::shared_ptr<Node> const& p) {
             return (getDistance(p -> getLocation(), get_mouse_coordinates())) <= radius;
         }
     );
+
+    if (p==nodes.end()) {
+        return nullptr;
+    }
+    return *p;
 }
 
 double GraphWindow::getDistance(const TDT4102::Point& loc1, const TDT4102::Point& loc2){
@@ -94,7 +127,7 @@ double GraphWindow::getDistance(const TDT4102::Point& loc1, const TDT4102::Point
 }
 
 void GraphWindow::drawNode(const std::shared_ptr<Node>& node){ 
-    draw_circle(node -> getLocation(), radius, nodeColor, node -> isSelected() ? selectedBorderColor : unselectedBorderColor);
+    draw_circle(node -> getLocation(), radius, node -> isSelected() ? selectedNodeColor : unselectedNodeColor,borderColor);
 }
 void GraphWindow::drawEdge(const TDT4102::Point& startPoint, const TDT4102::Point& endPoint, const bool selected){
     draw_line(startPoint, endPoint, selected ? selectedEdgeColor : unselectedEdgeColor);
@@ -161,4 +194,12 @@ void GraphWindow::changeMenuCallback() {
             currState = main;
             break;
     }
+}
+
+TDT4102::Point operator-(const TDT4102::Point& first, const TDT4102::Point& second) {
+    return TDT4102::Point{first.x - second.x, first.y - second.y};
+}
+
+TDT4102::Point operator+(const TDT4102::Point& first, const TDT4102::Point& second){
+    return TDT4102::Point{first.x + second.x, first.y + second.y};
 }

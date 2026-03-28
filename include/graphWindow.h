@@ -8,6 +8,10 @@
 class GraphWindow : public TDT4102::AnimationWindow, public Graph
 {
 private:
+    //========================= Variables
+    TDT4102::Point lastMouseLocation{0,0};
+
+    bool rightMouseButtonClick = false;
     //========================= Constants
     static constexpr int bufW = 30;
     static constexpr int bufH = 30;
@@ -18,7 +22,7 @@ private:
     static constexpr int fieldW = 200;
     static constexpr int fieldH = 50;
 
-    static constexpr int radius = 50;
+    static constexpr int radius = 20;
 
     //========================= States
 
@@ -39,9 +43,11 @@ private:
 
     //========================= Colors
 
-    TDT4102::Color nodeColor = TDT4102::Color::purple;
-    TDT4102::Color unselectedBorderColor = TDT4102::Color::transparent;
-    TDT4102::Color selectedBorderColor = TDT4102::Color::blue_violet;
+    TDT4102::Color unselectedNodeColor = TDT4102::Color::purple;
+    TDT4102::Color selectedNodeColor = TDT4102::Color::blue_violet;
+
+    TDT4102::Color borderColor = TDT4102::Color::transparent;
+
     TDT4102::Color unselectedEdgeColor = TDT4102::Color::black;
     TDT4102::Color selectedEdgeColor = TDT4102::Color::blue;
 public:
@@ -52,8 +58,13 @@ public:
     void run();
     //========================= Get
 
-    std::shared_ptr<Node>& getNode(const TDT4102::Point& location);
+    std::shared_ptr<Node> getNode(const TDT4102::Point& location);
     double getDistance(const TDT4102::Point& loc1, const TDT4102::Point& loc2);
+    
+    //========================= Update
+
+    void updateMain();
+    
     //========================= Draw
     void drawMenu();
     void drawMain();
@@ -70,3 +81,6 @@ public:
     void changeMenuCallback();
     
 };
+
+TDT4102::Point operator-(const TDT4102::Point& first, const TDT4102::Point& second);
+TDT4102::Point operator+(const TDT4102::Point& first, const TDT4102::Point& second);

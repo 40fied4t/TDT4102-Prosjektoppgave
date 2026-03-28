@@ -23,25 +23,27 @@ public:
 
     /// @brief Gir nodens nåværende lokasjon.
     /// @return location.
-    TDT4102::Point getLocation() const {return location;}
+    TDT4102::Point getLocation() const {return this -> location;}
 
     /// @brief Gir nodens nåværende navn.
     /// @return label.
-    std::string getLabel() const {return label;}
+    std::string getLabel() const {return this -> label;}
 
     /// @brief Setter nytt navn for noden.
     /// @param newLabel det nyet navnet til noden.
-    void setLabel(std::string newLabel) {label = newLabel;}
+    void setLabel(std::string newLabel) {this -> label = newLabel;}
 
     /// @brief Viser om noden er valgt.
     /// @return selected.
-    bool isSelected() const {return selected;}
+    bool isSelected() const {return this -> selected;}
 
 
     /// @brief Tilegner selected = !selected.
-    void updateSelect() {selected = !selected;}
+    void updateSelect() {this -> selected = !this -> selected;}
 
-    void setSelect(const bool truthVal) {selected = truthVal;}
+    void setSelect(const bool truthVal) {this -> selected = truthVal;}
+
+    void setLocation(const TDT4102::Point location) {this -> location = location;}
 };
 
 
