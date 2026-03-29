@@ -148,8 +148,9 @@ void Graph::removeAllEdgesOfNode(std::shared_ptr<Node> node){
         removeEdge(node, it);
     }
 }
-void Graph::addNode(const TDT4102::Point location, std::string label){
+std::shared_ptr<Node> Graph::addNode(const TDT4102::Point location, std::string label){
     nodes.emplace_back(std::make_shared<Node>(location, label));
+    return nodes.back();
 }
 void Graph::removeNode(const std::shared_ptr<Node> node){
     
@@ -457,4 +458,21 @@ void Graph::saveToEdg(std::filesystem::path fileName){
             it -> getWeight() << "\n";
         }
     }
+}
+
+
+double Graph::getDistance(const TDT4102::Point& first, const TDT4102::Point& second) const {
+    int diffX = first.x - second.x;
+    int diffY = first.y - second.y;
+
+    return std::sqrt(diffX * diffX + diffY * diffY);
+}
+
+
+TDT4102::Point operator-(const TDT4102::Point& first, const TDT4102::Point& second) {
+    return TDT4102::Point{first.x - second.x, first.y - second.y};
+}
+
+TDT4102::Point operator+(const TDT4102::Point& first, const TDT4102::Point& second){
+    return TDT4102::Point{first.x + second.x, first.y + second.y};
 }

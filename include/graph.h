@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <cmath>
 
 
 #include "exception.h"
@@ -20,9 +21,11 @@
 class Graph
 {
 private:
-    std::string nextLabel = "1";     ///< Navnet som blir gitt neste genererte node.
     std::vector<std::string> labelVec;  ///< Referansevektor for opptatte navn.
 protected:
+
+    std::string nextLabel = "1";     ///< Navnet som blir gitt neste genererte node.
+
     /// @brief Oppslagsverk for hvor en node fører.
     /// @details Dersom en node from leder til en annen node to, inneholder graphMap[from] to.
     std::unordered_map<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>> graphMap;
@@ -80,7 +83,7 @@ public:
     /// @brief Legger til en ny node i grafen.
     /// @param location Lokasjonen til den nye noden.
     /// @param label Navnet til den nye noden.
-    void addNode(const TDT4102::Point location, std::string label);
+    std::shared_ptr<Node> addNode(const TDT4102::Point location, std::string label);
 
     /// @brief Fjerner en node fra grafen.
     /// Kaller først removeAllEdgesOfNode().
@@ -162,4 +165,9 @@ public:
     /// @brief Laster opp grafstuktur som edge list til .edg fil, med vekting.
     /// @param fileName Filsti, må være .edg fil.
     void saveToEdg(std::filesystem::path fileName);
+
+    double getDistance(const TDT4102::Point& first, const TDT4102::Point& second) const;
 };
+
+TDT4102::Point operator-(const TDT4102::Point& first, const TDT4102::Point& second);
+TDT4102::Point operator+(const TDT4102::Point& first, const TDT4102::Point& second);

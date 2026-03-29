@@ -12,6 +12,7 @@ private:
     TDT4102::Point lastMouseLocation{0,0};
 
     bool rightMouseButtonClick = false;
+    int framesSinceLastLeftClick = 0;
     //========================= Constants
     static constexpr int bufW = 30;
     static constexpr int bufH = 30;
@@ -58,8 +59,7 @@ public:
     void run();
     //========================= Get
 
-    std::shared_ptr<Node> getNode(const TDT4102::Point& location);
-    double getDistance(const TDT4102::Point& loc1, const TDT4102::Point& loc2);
+    std::shared_ptr<Node> getNode(const TDT4102::Point& location) const;
     
     //========================= Update
 
@@ -82,5 +82,3 @@ public:
     
 };
 
-TDT4102::Point operator-(const TDT4102::Point& first, const TDT4102::Point& second);
-TDT4102::Point operator+(const TDT4102::Point& first, const TDT4102::Point& second);
