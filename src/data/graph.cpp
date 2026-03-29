@@ -467,12 +467,3 @@ double Graph::getDistance(const TDT4102::Point& first, const TDT4102::Point& sec
 
     return std::sqrt(diffX * diffX + diffY * diffY);
 }
-
-
-TDT4102::Point operator-(const TDT4102::Point& first, const TDT4102::Point& second) {
-    return TDT4102::Point{first.x - second.x, first.y - second.y};
-}
-
-TDT4102::Point operator+(const TDT4102::Point& first, const TDT4102::Point& second){
-    return TDT4102::Point{first.x + second.x, first.y + second.y};
-}

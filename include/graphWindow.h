@@ -3,7 +3,8 @@
 #include <cmath>
 
 #include "include/graph.h"
-#include "include/point.h"
+#include "pointOperations.h"
+
 #include "widgets/Button.h"
 #include "widgets/TextInput.h"
 class GraphWindow : public TDT4102::AnimationWindow, public Graph

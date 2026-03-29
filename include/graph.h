@@ -168,6 +168,3 @@ public:
 
     double getDistance(const TDT4102::Point& first, const TDT4102::Point& second) const;
 };
-
-TDT4102::Point operator-(const TDT4102::Point& first, const TDT4102::Point& second);
-TDT4102::Point operator+(const TDT4102::Point& first, const TDT4102::Point& second);
