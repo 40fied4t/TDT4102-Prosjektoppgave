@@ -73,22 +73,28 @@ void GraphWindow::updateMain() {
     TDT4102::Point currMouseLocation = get_mouse_coordinates();
     TDT4102::Point deltaMouseMovement = currMouseLocation - lastMouseLocation;
 
-    if (framesSinceLastLeftClick < 100)
-        framesSinceLastLeftClick++;
-    
+    if (framesSinceLastHoveredLeftClick < 100)
+        framesSinceLastHoveredLeftClick++;
+
+    //================================================== Node Hovered
     if (std::shared_ptr<Node> hoveredNode{getNode(currMouseLocation)}) {
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LCLICK
+        
+        if (is_left_mouse_button_down() && framesSinceLastHoveredLeftClick < 10) {
 
-        if (is_left_mouse_button_down() && framesSinceLastLeftClick < 20) {
+            auto newNode = addNode(get_mouse_coordinates(), nextLabel);
+            int w = getInputWeight();
+            updateNextLabel();
+
             if (is_key_down(KeyboardKey::LEFT_CTRL) || is_key_down(KeyboardKey::RIGHT_CTRL)) {
-                addNode(get_mouse_coordinates(), nextLabel);
-                updateNextLabel();
+                addDirectionalEdge(hoveredNode, newNode, w);
             }
             else {
-
+                addEdge(hoveredNode, newNode, w);
             }
-
-            framesSinceLastLeftClick = 0;
+            std::swap(hoveredNode, newNode);
+            framesSinceLastHoveredLeftClick = 0;
         }
         while (is_left_mouse_button_down()) {
             hoveredNode -> setLocation(hoveredNode -> getLocation() + deltaMouseMovement);
@@ -99,10 +105,10 @@ void GraphWindow::updateMain() {
             currMouseLocation = get_mouse_coordinates();
             deltaMouseMovement = currMouseLocation - lastMouseLocation;
 
-            framesSinceLastLeftClick = 0;
+            framesSinceLastHoveredLeftClick = 0;
         }
 
-
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RCLICK
         if (is_right_mouse_button_down() && !rightMouseButtonClick) {
             hoveredNode -> updateSelect();
             rightMouseButtonClick = true;
@@ -111,9 +117,33 @@ void GraphWindow::updateMain() {
             rightMouseButtonClick = false;
         }
     }
+    //================================================== DRAG
+
+    while (is_left_mouse_button_down()) {
+        for (auto & it : nodes) {
+            it -> setLocation(it -> getLocation() + deltaMouseMovement);
+        }
+            
+        drawMain();
+        next_frame();
+
+        lastMouseLocation = currMouseLocation;
+        currMouseLocation = get_mouse_coordinates();
+        deltaMouseMovement = currMouseLocation - lastMouseLocation;
+    }
+
+
+    //================================================== ZOOM
+
+    if (float deltaMouseWheel = get_delta_mouse_wheel()) {
+
+    }
 
     lastMouseLocation = currMouseLocation;
 }
+
+
+
 
 void GraphWindow::drawMain() {
     drawAllEdges();
@@ -207,4 +237,28 @@ std::shared_ptr<Node> GraphWindow::getNode(const TDT4102::Point& location) const
         return nullptr;
     }
     return *p;
+}
+
+int GraphWindow::getInputWeight() const {
+    if (is_key_down(KeyboardKey::KEY_1) || is_key_down(KeyboardKey::NUMPAD_1)) 
+        return 1;
+    else if (is_key_down(KeyboardKey::KEY_2) || is_key_down(KeyboardKey::NUMPAD_2))
+        return 2;
+    else if (is_key_down(KeyboardKey::KEY_3) || is_key_down(KeyboardKey::NUMPAD_3))
+        return 3;
+    else if (is_key_down(KeyboardKey::KEY_4) || is_key_down(KeyboardKey::NUMPAD_4))
+        return 4;
+    else if (is_key_down(KeyboardKey::KEY_5) || is_key_down(KeyboardKey::NUMPAD_5))
+        return 5;
+    else if (is_key_down(KeyboardKey::KEY_6) || is_key_down(KeyboardKey::NUMPAD_6)) 
+        return 6;
+    else if (is_key_down(KeyboardKey::KEY_7) || is_key_down(KeyboardKey::NUMPAD_7))
+        return 7;
+    else if (is_key_down(KeyboardKey::KEY_8) || is_key_down(KeyboardKey::NUMPAD_8))
+        return 8;
+    else if (is_key_down(KeyboardKey::KEY_9) || is_key_down(KeyboardKey::NUMPAD_9))
+        return 9;
+    else if (is_key_down(KeyboardKey::KEY_0) || is_key_down(KeyboardKey::NUMPAD_0))
+        return 0;
+    return 1;
 }

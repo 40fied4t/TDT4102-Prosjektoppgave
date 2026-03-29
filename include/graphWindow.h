@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "include/graph.h"
+#include "include/point.h"
 #include "widgets/Button.h"
 #include "widgets/TextInput.h"
 class GraphWindow : public TDT4102::AnimationWindow, public Graph
@@ -10,9 +11,10 @@ class GraphWindow : public TDT4102::AnimationWindow, public Graph
 private:
     //========================= Variables
     TDT4102::Point lastMouseLocation{0,0};
+    TDT4102::Point relativeWindowCoordinates{0,0};
 
     bool rightMouseButtonClick = false;
-    int framesSinceLastLeftClick = 0;
+    int framesSinceLastHoveredLeftClick = 0;
     //========================= Constants
     static constexpr int bufW = 30;
     static constexpr int bufH = 30;
@@ -60,7 +62,6 @@ public:
     //========================= Get
 
     std::shared_ptr<Node> getNode(const TDT4102::Point& location) const;
-    
     //========================= Update
 
     void updateMain();
@@ -79,6 +80,9 @@ public:
     void loadButtonCallback();
     void saveButtonCallback();
     void changeMenuCallback();
-    
-};
 
+    //========================= Input
+
+    int getInputWeight() const;
+
+};
