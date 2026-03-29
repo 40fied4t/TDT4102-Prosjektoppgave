@@ -121,7 +121,7 @@ void GraphWindow::updateMain() {
 
     while (is_left_mouse_button_down()) {
         for (auto & it : nodes) {
-            it -> setLocation(it -> getLocation() + deltaMouseMovement);
+            it -> setLocation(it -> getLocation() + 0.8 * deltaMouseMovement);
         }
             
         drawMain();
@@ -136,7 +136,11 @@ void GraphWindow::updateMain() {
     //================================================== ZOOM
 
     if (float deltaMouseWheel = get_delta_mouse_wheel()) {
-
+        TDT4102::Point mouseCoords = get_mouse_coordinates();
+        for (auto& it : nodes) {
+            TDT4102::Point delta = 0.1 * deltaMouseWheel * (it -> getLocation() - mouseCoords);
+            it -> setLocation(it -> getLocation() + delta);
+        }
     }
 
     lastMouseLocation = currMouseLocation;
@@ -158,7 +162,22 @@ void GraphWindow::drawNode(const std::shared_ptr<Node>& node){
     draw_circle(node -> getLocation(), radius, node -> isSelected() ? selectedNodeColor : unselectedNodeColor,borderColor);
 }
 void GraphWindow::drawEdge(const TDT4102::Point& startPoint, const TDT4102::Point& endPoint, const bool selected){
-    draw_line(startPoint, endPoint, selected ? selectedEdgeColor : unselectedEdgeColor);
+    TDT4102::Point tangent = getTangent(endPoint - startPoint);
+    TDT4102::Point normal = getNormal(endPoint - startPoint);
+
+    draw_quad(
+        startPoint + (edgeW * normal),
+        endPoint + (edgeW * normal),
+        endPoint - (edgeW * normal),
+        startPoint - (edgeW * normal),
+        selected ? selectedEdgeColor : unselectedEdgeColor
+    );
+    draw_triangle(
+        endPoint -  0.1 * radius * tangent,
+        endPoint - 0.5 * edgeW * radius * tangent +  5 * edgeW * normal,
+        endPoint - 0.5 * edgeW * radius * tangent - 5 * edgeW * normal,
+        selected ? selectedEdgeColor : unselectedEdgeColor
+    );
 }
 
 void GraphWindow::drawAllNodes(){
@@ -196,12 +215,12 @@ void GraphWindow::loadButtonCallback(){
 void GraphWindow::saveButtonCallback(){
     std::filesystem::path fileName = fileInput.getText();
 
-    // if (!fileName.has_extension()) {
-    //     fileName.replace_extension(".adj");
-    //     saveToAdj(fileName);
-    //     fileName.replace_extension(".edg");
-    //     saveToEdg(fileName);
-    // }
+    if (!fileName.has_extension()) {
+        fileName.replace_extension(".adj");
+        saveToAdj(fileName);
+        fileName.replace_extension(".edg");
+        saveToEdg(fileName);
+    }
     if (fileName.extension() == ".adj") {
         saveToAdj(fileName);
     }

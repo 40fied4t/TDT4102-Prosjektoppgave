@@ -16,6 +16,9 @@ private:
 
     bool rightMouseButtonClick = false;
     int framesSinceLastHoveredLeftClick = 0;
+
+    int radius = 20;
+    double edgeW = 0.5;
     //========================= Constants
     static constexpr int bufW = 30;
     static constexpr int bufH = 30;
@@ -26,7 +29,7 @@ private:
     static constexpr int fieldW = 200;
     static constexpr int fieldH = 50;
 
-    static constexpr int radius = 20;
+    
 
     //========================= States
 
@@ -43,8 +46,13 @@ private:
     TDT4102::Button saveButton;
     TDT4102::Button changeMenuButton;
 
+    //========================= Textfield
+
     TDT4102::TextInput fileInput;
 
+    //========================= Slider
+
+    
     //========================= Colors
 
     TDT4102::Color unselectedNodeColor = TDT4102::Color::purple;

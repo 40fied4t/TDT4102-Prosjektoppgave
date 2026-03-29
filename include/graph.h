@@ -165,6 +165,4 @@ public:
     /// @brief Laster opp grafstuktur som edge list til .edg fil, med vekting.
     /// @param fileName Filsti, må være .edg fil.
     void saveToEdg(std::filesystem::path fileName);
-
-    double getDistance(const TDT4102::Point& first, const TDT4102::Point& second) const;
 };

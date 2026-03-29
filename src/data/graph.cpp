@@ -459,11 +459,3 @@ void Graph::saveToEdg(std::filesystem::path fileName){
         }
     }
 }
-
-
-double Graph::getDistance(const TDT4102::Point& first, const TDT4102::Point& second) const {
-    int diffX = first.x - second.x;
-    int diffY = first.y - second.y;
-
-    return std::sqrt(diffX * diffX + diffY * diffY);
-}
