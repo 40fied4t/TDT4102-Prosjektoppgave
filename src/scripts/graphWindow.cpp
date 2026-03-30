@@ -1,66 +1,91 @@
 #include "include/graphWindow.h"
 
-GraphWindow::GraphWindow():
-    Graph(),
-    AnimationWindow(50, 50, Graph::width, Graph::height, "Grafvisualisering"),
+// GraphWindow::GraphWindow():
+//     Graph(),
+//     AnimationWindow(0, 0, Graph::width, Graph::height, "Grafvisualisering"),
 
 
-    loadButton{TDT4102::Point{bufW,50}, btnW, btnH, "load"},
-    saveButton{TDT4102::Point{bufW, 100}, btnW, btnH, "save"},
-    changeMenuButton{TDT4102::Point{Graph::width - bufW - btnW, bufH}, btnW, btnH, "change"},
+//     loadButton{TDT4102::Point{bufW,50}, btnW, btnH, "load"},
+//     saveButton{TDT4102::Point{bufW, 100}, btnW, btnH, "save"},
+//     pauseMenuButton{TDT4102::Point{Graph::width - bufW - btnW, bufH}, btnW, btnH, "pause"},
 
-    fileInput{TDT4102::Point{bufW, 150}, fieldW, fieldH, "filename"}
-    {
-    loadButton.setCallback(std::bind(&GraphWindow::loadButtonCallback, this));
-    saveButton.setCallback(std::bind(&GraphWindow::saveButtonCallback, this));
-    changeMenuButton.setCallback(std::bind(&GraphWindow::changeMenuCallback, this));
+//     fileInput{TDT4102::Point{bufW, 150}, fieldW, fieldH, "filename"}
+//     {
+//     loadButton.setCallback(std::bind(&GraphWindow::loadButtonCallback, this));
+//     saveButton.setCallback(std::bind(&GraphWindow::saveButtonCallback, this));
+//     pauseMenuButton.setCallback(std::bind(&GraphWindow::pauseMenuCallback, this));
 
-    add(loadButton);
-    add(saveButton);
-    add(changeMenuButton);
-    add(fileInput);
-}
+//     add(loadButton);
+//     add(saveButton);
+//     add(pauseMenuButton);
+//     add(fileInput);
+// }
 
 GraphWindow::GraphWindow(std::filesystem::path fileName):
     Graph(fileName),
-    AnimationWindow(50, 50, Graph::width, Graph::height, "Grafvisualisering"),
+    AnimationWindow(50, 50, 1024, 768, "Grafvisualisering"),
 
-    loadButton{TDT4102::Point{bufW,100}, btnW, btnH, "load"},
-    saveButton{TDT4102::Point{bufW, 200}, btnW, btnH, "save"},
-    changeMenuButton{TDT4102::Point{Graph::width - bufW - btnW, bufH}, btnW, btnH, "change"},
+    //========================= Buttons
 
-    fileInput{TDT4102::Point{bufW, 300}, fieldW, fieldH, "filename"}
+    importMenuButton{mainMenuTopLeft + buffer + 2 * bufferH, btnW, btnH, "import"},
+    exportMenuButton{mainMenuTopLeft + buffer + 3 * bufferH, btnW, btnH, "export"},
+    infoMenuButton{mainMenuTopLeft + buffer + 4 * bufferH, btnW, btnH, "info"},
+    colorMenuButton{mainMenuTopLeft + buffer + 5 * bufferH, btnW, btnH, "color"}, // Maybe dropdown?
+
+    pauseMenuButton{topRight + bufferH - bufferW - TDT4102::Point{btnW, 0}, btnW, btnH, "resume"},
+    subMenuButton{subMenuTopLeft + bufferH, btnW, btnH, "load"},
+    //========================= Textfield
+
+    fileInput{subMenuTopLeft + 2 * bufferH, fieldW, fieldH, "filename"},
+
+    //========================= Slider
+
+    radiusSlider{bottomLeft - bufferH + bufferW, fieldW, fieldH},
+    edgeSlider{bottomLeft - bufferH + 5* bufferW, fieldW, fieldH}
     {
-    loadButton.setCallback(std::bind(&GraphWindow::loadButtonCallback, this));
-    saveButton.setCallback(std::bind(&GraphWindow::saveButtonCallback, this));
-    changeMenuButton.setCallback(std::bind(&GraphWindow::changeMenuCallback, this));
+    importMenuButton.setCallback(std::bind(importMenuCallback, this));
+    exportMenuButton.setCallback(std::bind(exportMenuCallback, this));
+    infoMenuButton.setCallback(std::bind(infoMenuCallback, this));
+    colorMenuButton.setCallback(std::bind(colorMenuCallback, this));
+    
+    pauseMenuButton.setCallback(std::bind(pauseMenuCallback, this));
+    subMenuButton.setCallback(std::bind(subMenuCallback, this));
 
-    add(loadButton);
-    add(saveButton);
-    add(changeMenuButton);
+    add(importMenuButton);
+    add(exportMenuButton);
+    add(pauseMenuButton);
+    add(subMenuButton);
+    add(infoMenuButton);
+    add(colorMenuButton);
     add(fileInput);
+    add(radiusSlider);
+    add(edgeSlider);
+
+    updateGUI();
 }
 
 void GraphWindow::run() {
     while(!should_close()){
+        updateGUI();
         switch (currState) {
-            case menu:
-                loadButton.setVisible(true);
-                saveButton.setVisible(true);
-                fileInput.setVisible(true);
+            case infoMenu:
+            case colorMenu:
+            case exportMenu:
+            case importMenu:
+            case mainMenu:
+                drawMain();
+                if (currState != mainMenu) {
+                    drawSubMenu();
+                }
                 drawMenu();
                 next_frame();
                 break;
-            case main:
-                loadButton.setVisible(false);
-                saveButton.setVisible(false);
-                fileInput.setVisible(false);
+
+            case popUp:
+            case mainScreen:
                 updateMain();
                 drawMain();
                 next_frame();
-                break;
-            case closed:
-                close();
                 break;
             default:
                 std::cerr << "wrong Currstate\n";
@@ -75,6 +100,9 @@ void GraphWindow::updateMain() {
 
     if (framesSinceLastHoveredLeftClick < 100)
         framesSinceLastHoveredLeftClick++;
+    if (framesSinceLastHoveredRightClick < 100) {
+        framesSinceLastHoveredRightClick++;
+    }
 
     //================================================== Node Hovered
     if (std::shared_ptr<Node> hoveredNode{getNode(currMouseLocation)}) {
@@ -109,7 +137,11 @@ void GraphWindow::updateMain() {
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RCLICK
-        if (is_right_mouse_button_down() && !rightMouseButtonClick) {
+        if (is_right_mouse_button_down() && framesSinceLastHoveredRightClick < 10) {
+            removeNode(hoveredNode);
+            rightMouseButtonClick = true;
+        }
+        else if (is_right_mouse_button_down() && !rightMouseButtonClick) {
             hoveredNode -> updateSelect();
             rightMouseButtonClick = true;
         }
@@ -117,6 +149,16 @@ void GraphWindow::updateMain() {
             rightMouseButtonClick = false;
         }
     }
+    //================================================== Delete
+
+    if (is_key_down(KeyboardKey::BACKSPACE)) {
+        removeSelectedEdges();
+    }
+    if (is_key_down(KeyboardKey::DELETE)){
+        removeSelectedNodes();
+    }
+
+
     //================================================== DRAG
 
     while (is_left_mouse_button_down()) {
@@ -152,18 +194,26 @@ void GraphWindow::updateMain() {
 void GraphWindow::drawMain() {
     drawAllEdges();
     drawAllNodes();
+    drawMouseCoordinates();
 }
 
 void GraphWindow::drawMenu() {
+    draw_rectangle(mainMenuTopLeft, menuW, menuH, menuColor);
+    lastMouseLocation = get_mouse_coordinates();
+}
+
+void GraphWindow::drawSubMenu() {
+    draw_rectangle(subMenuTopLeft, menuW, menuH, subMenuColor);
 }
 
 
 void GraphWindow::drawNode(const std::shared_ptr<Node>& node){ 
     draw_circle(node -> getLocation(), radius, node -> isSelected() ? selectedNodeColor : unselectedNodeColor,borderColor);
 }
-void GraphWindow::drawEdge(const TDT4102::Point& startPoint, const TDT4102::Point& endPoint, const bool selected){
+void GraphWindow::drawEdge(const TDT4102::Point& startPoint, const TDT4102::Point& endPoint, const bool selected, const int& weight){
     TDT4102::Point tangent = getTangent(endPoint - startPoint);
     TDT4102::Point normal = getNormal(endPoint - startPoint);
+    double distance = getDistance(startPoint, endPoint);
 
     draw_quad(
         startPoint + (edgeW * normal),
@@ -172,12 +222,29 @@ void GraphWindow::drawEdge(const TDT4102::Point& startPoint, const TDT4102::Poin
         startPoint - (edgeW * normal),
         selected ? selectedEdgeColor : unselectedEdgeColor
     );
-    draw_triangle(
-        endPoint -  0.1 * radius * tangent,
-        endPoint - 0.5 * edgeW * radius * tangent +  5 * edgeW * normal,
-        endPoint - 0.5 * edgeW * radius * tangent - 5 * edgeW * normal,
-        selected ? selectedEdgeColor : unselectedEdgeColor
-    );
+    if (distance > 5 * radius) {
+        draw_triangle(
+            endPoint -  0.1 * radius * tangent,
+            endPoint - 0.5 * edgeW * radius * tangent +  5 * edgeW * normal,
+            endPoint - 0.5 * edgeW * radius * tangent - 5 * edgeW * normal,
+            selected ? selectedEdgeColor : unselectedEdgeColor
+        );
+    }
+    else {
+        draw_triangle(
+            endPoint -  0.1 * radius * tangent,
+            endPoint - 0.5 * edgeW * radius * (distance/(5 * radius)) * tangent +  5 * edgeW * (distance/(5 * radius)) * normal,
+            endPoint - 0.5 * edgeW * radius * (distance/(5 * radius)) * tangent - 5 * edgeW * (distance/(5 * radius)) * normal,
+            selected ? selectedEdgeColor : unselectedEdgeColor
+        );
+    }
+    if (weight != 1) {
+        draw_text(
+            startPoint + 0.5 * (endPoint - startPoint),
+            std::to_string(weight)
+        );
+    }
+    
 }
 
 void GraphWindow::drawAllNodes(){
@@ -190,7 +257,7 @@ void GraphWindow::drawAllEdges(){
         for (const auto& from : it -> getFrom()) {
             for (const auto& to : it -> getTo()) {
                 if (from != to) {
-                    drawEdge(from -> getLocation(), to -> getLocation(), it -> getSelect());
+                    drawEdge(from -> getLocation(), to -> getLocation(), it -> getSelect(), it -> getWeight());
                 }
             }
         }
@@ -232,14 +299,68 @@ void GraphWindow::saveButtonCallback(){
     }
 }
 
-void GraphWindow::changeMenuCallback() {
+void GraphWindow::pauseMenuCallback() {
     switch (currState) {
-        case main:
-            currState = menu;
+        case popUp:
+        case mainScreen:
+            currState = mainMenu;
+            pauseMenuButton.setLabel("resume");
             break;
-        case menu:
-            currState = main;
+
+        default:
+            currState = mainScreen;
+            pauseMenuButton.setLabel("pause");
             break;
+    }
+}
+
+void GraphWindow::exportMenuCallback(){
+    switch (currState) {
+        case exportMenu:
+            currState = mainMenu;
+            break;
+        default:
+            currState = exportMenu;
+    }
+}
+void GraphWindow::importMenuCallback(){
+    switch (currState) {
+        case importMenu:
+            currState = mainMenu;
+            break;
+        default:
+            currState = importMenu;
+    }
+}
+void GraphWindow::colorMenuCallback(){
+    switch (currState) {
+        case colorMenu:
+            currState = mainMenu;
+            break;
+        default:
+            currState = colorMenu;
+    }
+}
+void GraphWindow::infoMenuCallback(){
+    switch (currState) {
+        case infoMenu:
+            currState = mainMenu;
+            break;
+        deafult:
+            currState = infoMenu;
+    }
+}
+
+void GraphWindow::subMenuCallback() {
+    switch (currState) {
+        case importMenu:
+            loadButtonCallback();
+            break;
+        case exportMenu:
+            saveButtonCallback();
+            break;
+        default:
+            std::cerr << "SubMenu while in wrong state\n";
     }
 }
 
@@ -280,4 +401,54 @@ int GraphWindow::getInputWeight() const {
     else if (is_key_down(KeyboardKey::KEY_0) || is_key_down(KeyboardKey::NUMPAD_0))
         return 0;
     return 1;
+}
+
+void GraphWindow::updateGUI() {
+    switch (currState) {
+        case importMenu:
+            subMenuButton.setLabel("load");
+        case exportMenu:
+            if (currState == exportMenu) {
+                subMenuButton.setLabel("save");
+            }
+            subMenuButton.setVisible(true);
+            fileInput.setVisible(true);
+        case infoMenu:
+        case colorMenu:
+        case mainMenu:
+            if (!(currState == importMenu || currState == exportMenu)) {
+                subMenuButton.setVisible(false);
+                fileInput.setVisible(false);
+                fileInput.setText("filename");
+            }
+
+            radiusSlider.setVisible(false);
+            edgeSlider.setVisible(false);
+
+            importMenuButton.setVisible(true);
+            exportMenuButton.setVisible(true);
+            infoMenuButton.setVisible(true);
+            colorMenuButton.setVisible(true);
+            break;
+
+        default:
+            radiusSlider.setVisible(true);
+            edgeSlider.setVisible(true);
+
+            subMenuButton.setVisible(false);
+            fileInput.setVisible(false);
+            importMenuButton.setVisible(false);
+            exportMenuButton.setVisible(false);
+            infoMenuButton.setVisible(false);
+            colorMenuButton.setVisible(false);
+    }
+}
+
+void GraphWindow::drawMouseCoordinates() {
+    TDT4102::Point coords = get_mouse_coordinates();
+    std::string s = "x: " + std::to_string(relativeWindowCoordinates.x + coords.x) + " y: " + std::to_string(relativeWindowCoordinates.y + coords.y);
+    draw_text(
+        topLeft + buffer,
+        s
+    );
 }
