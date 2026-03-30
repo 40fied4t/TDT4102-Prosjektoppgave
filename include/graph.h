@@ -36,17 +36,13 @@ protected:
     /// @brief Vektor med shared_ptr til alle kanter grafen inneholder.
     std::vector<std::shared_ptr<Node>> nodes;
 
-    /// @brief Vektor med shared_ptr til valgte noder.
-    /// @note Oppdateres via updateSelectedNodes(), og funksjoner som kaller denne.
-    std::vector<std::shared_ptr<Node>> selectedNodes;
-
     static constexpr int width = 1024;  ///< Vinduets bredde.
     static constexpr int height = 768;  ///< Vinduets høyde.
 public:
 
     /// @brief Oppdaterer selectedNodes
     /// @details Kaller selectedNodes.clear(), og legger så til noder fra nodes der Node::isSelected() == true.
-    void updateSelectedNodes();
+    std::vector<std::shared_ptr<Node>> getSelectedNodes() const;
     /// @brief Finner neste heltallsnavn som ikke er tatt i bruk og oppdaterer nextLabel.
     void updateNextLabel();
 

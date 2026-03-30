@@ -5,14 +5,18 @@
 //implementer Edge, og arvede klasser
 
 //implementer Graph
-void Graph::updateSelectedNodes(){
-    selectedNodes.clear();
+
+
+std::vector<std::shared_ptr<Node>> Graph::getSelectedNodes() const{
+    std::vector<std::shared_ptr<Node>> selectedNodes;
     for (auto &it : nodes) {
         if (it -> isSelected()) {
-            selectedNodes.emplace_back(it);
+            selectedNodes.push_back(it);
         }
     }
+    return selectedNodes;
 }
+
 void Graph::updateNextLabel(){
     int labelInt = 1;
     auto it = labelVec.begin();
@@ -71,7 +75,7 @@ void Graph::addDirectionalEdge(std::shared_ptr<Node> from, std::shared_ptr<Node>
 }
 
 void Graph::addSelectedEdges(const int weight){
-    updateSelectedNodes();
+    auto selectedNodes = getSelectedNodes();
 
     for (auto i = selectedNodes.begin(); i != selectedNodes.end(); ++i) {
         for (auto j = i; j != selectedNodes.end(); ++j) {
@@ -97,24 +101,11 @@ void Graph::removeEdge(std::shared_ptr<Node> first, std::shared_ptr<Node> second
             }
         }
         if (firstFound && secondFound) {
-            edgeVec.erase(
-                std::remove_if( // Fjern elementet fra edgeVec
-                    edgeVec.begin(),
-                    edgeVec.end(),
-                    //Benytter lambdafunksjon som predikat
-                    [&] (std::shared_ptr<Edge> const& p)
-                        {   // Predikatet sjekker om de peker til samme underliggende Edge
-                        return p == it;
-                    }),
-                edgeVec.end()
-                );
-            //Fjerner kanten fra graphMap
             for (auto& fromIt : it -> getFrom()) {
                 graphMap[fromIt].erase(
-                    std::remove_if( // Fjerner element fra graphMap[fromIt] dersom det ligger i toIt
+                    std::remove_if(
                         graphMap[fromIt].begin(),
                         graphMap[fromIt].end(),
-                        //Benytter lambdafunksjon som predikat
                         [&] (std::shared_ptr<Node> const& p)
                             {
                             for (auto& toIt : it -> getTo()) {
@@ -125,7 +116,16 @@ void Graph::removeEdge(std::shared_ptr<Node> first, std::shared_ptr<Node> second
                     graphMap[fromIt].end()
                     );
             }
-            //Fant kanten
+            edgeVec.erase(
+                std::remove_if(
+                    edgeVec.begin(),
+                    edgeVec.end(),
+                    [&] (std::shared_ptr<Edge> const& p)
+                        {
+                        return p == it;
+                    }),
+                edgeVec.end()
+                );
             return;
         }
     }
@@ -134,7 +134,7 @@ void Graph::removeEdge(std::shared_ptr<Node> first, std::shared_ptr<Node> second
 }
 
 void Graph::removeSelectedEdges(){
-    updateSelectedNodes();
+    auto selectedNodes = getSelectedNodes();
 
     for (auto i = selectedNodes.begin(); i != selectedNodes.end();++i) {
         for (auto j = i + 1; j != selectedNodes.end();++j) {
@@ -174,25 +174,11 @@ void Graph::removeNode(const std::shared_ptr<Node> node){
         labelVec.end()
         );
 
-    selectedNodes.erase(
-        std::remove(
-            selectedNodes.begin(),
-            selectedNodes.end(),
-            node),
-        selectedNodes.end()
-        );
-
     updateNextLabel();
-
-    if (node.use_count() > 1){
-        std::cerr << "Did not remove all instances of node\n";
-    }
 }
 void Graph::removeSelectedNodes(){
-    updateSelectedNodes();
-
-    while (std::shared_ptr<Node> node = selectedNodes.back()) {
-        selectedNodes.pop_back();
+    auto selectedNodes = getSelectedNodes();
+    for (auto &node : selectedNodes) {
         removeNode(node);
     }
 }
@@ -217,7 +203,6 @@ void Graph::empty() {
     graphMap.clear();
     edgeVec.clear();
     nodes.clear();
-    selectedNodes.clear();
 }
 
 std::vector<TDT4102::Point> Graph::generatePositions(const int& n) {
@@ -235,7 +220,6 @@ Graph::Graph()
     graphMap = std::unordered_map<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>>();
     edgeVec = std::vector<std::shared_ptr<Edge>>();
     nodes = std::vector<std::shared_ptr<Node>>();
-    selectedNodes = std::vector<std::shared_ptr<Node>>();
     addNode({width/2, height/2}, nextLabel);
     updateNextLabel();
 }
@@ -244,7 +228,6 @@ Graph::Graph(std::filesystem::path fileName)
     graphMap = std::unordered_map<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>>();
     edgeVec = std::vector<std::shared_ptr<Edge>>();
     nodes = std::vector<std::shared_ptr<Node>>();
-    selectedNodes = std::vector<std::shared_ptr<Node>>();
 
     if (fileName.extension() == ".adj") {
         std::cout << "Loading .adj file\n";
