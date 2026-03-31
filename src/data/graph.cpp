@@ -85,7 +85,6 @@ void Graph::addSelectedEdges(const int weight){
 }
 
 void Graph::removeEdge(std::shared_ptr<Node> first, std::shared_ptr<Node> second) {
-    //Fjerner kanten fra edgeVec
     if (first == second) return;
     bool firstFound;
     bool secondFound;
@@ -307,19 +306,16 @@ void Graph::loadFromAdj(std::filesystem::path fileName){
     }
 
     std::vector<TDT4102::Point> positionVec = generatePositions(labelVec.size());
-    //Avbryt dersom 
     if (labelMap.size() != positionVec.size() || positionVec.size() != labelVec.size()) {
         std::cout << "size error" << labelMap.size() << " " << positionVec.size() << " " << labelVec.size() << std::endl;
         throw BadFormat();
         return;
     }
-    //tøm graf og generer nye noder
     empty();
     for (int i = 0; i < labelVec.size(); ++i) {
         addNode(positionVec[i], labelVec[i]);
     }
     updateNextLabel();
-    //generer kanter
     for (auto i = labelVec.begin(); i != labelVec.end(); ++i) {
         for (auto j = i +1; j != labelVec.end(); ++j) {
             bool iToj = leadsTo<std::string>(labelMap, *i, *j);
@@ -443,6 +439,73 @@ void Graph::saveToEdg(std::filesystem::path fileName){
             it -> getFrom()[0] -> getLabel() << " > " <<
             it -> getTo()[0] -> getLabel() << " " <<
             it -> getWeight() << "\n";
+        }
+    }
+}
+
+int Graph::getShortestPath(std::shared_ptr<Node>& from, std::shared_ptr<Node>& to){
+     for (auto& it :nodes) {
+        it -> setCount(9999);
+     }
+     for (auto& it : edgeVec) {
+        it -> setSelect(false);
+     }
+     from -> setCount(0);
+     searchNext(from);
+     if (to -> getCount() >= 9999) {
+        return 9999;
+     }
+     auto oppositeMap = getOppositeDirectedGraphMap();
+     auto currNode = to;
+     while (currNode != from) {
+        auto nextNode = *std::min_element(
+            oppositeMap[currNode].begin(),
+            oppositeMap[currNode].end(),
+            [&] (const std::shared_ptr<Node>& a, const std::shared_ptr<Node>& b){
+                return a -> getCount() < b -> getCount();
+            }
+        );
+        getEdge(nextNode, currNode) -> setSelect(true);
+        currNode = nextNode;
+     }
+     return to -> getCount();
+}
+
+void Graph::searchNext(std::shared_ptr<Node>& node) {
+    int baseCount = node -> getCount();
+    for (auto& it : graphMap[node]) {
+        int w = getEdge(node, it) -> getWeight();
+        if (it -> getCount() > baseCount + w) {
+            it -> setCount(baseCount + w);
+            searchNext(it);
+        }
+    }    
+}
+
+std::shared_ptr<Edge> Graph::getEdge(std::shared_ptr<Node>& first, std::shared_ptr<Node>& second) const {
+    for (auto& it : edgeVec) {
+        bool firstFound = false;
+        bool secondFound = false;
+        for (auto nodeIterator : it -> getNodeVec()) {
+            if (nodeIterator == first) {
+                firstFound = true;
+            }
+            if (nodeIterator == second) {
+                secondFound = true;
+            }
+        }
+
+        if (firstFound && secondFound) 
+            return it;
+    }
+    return nullptr;
+}
+
+std::unordered_map<std::shared_ptr<Node>, std::unordered_set<std::shared_ptr<Node>>> Graph::getOppositeDirectedGraphMap() const {
+    std::unordered_map<std::shared_ptr<Node>, std::unordered_set<std::shared_ptr<Node>>> oppositeMap;
+    for (const auto& [key, vec] : graphMap) {
+        for (const auto& it : vec) {
+            oppositeMap[it].insert(key);
         }
     }
 }

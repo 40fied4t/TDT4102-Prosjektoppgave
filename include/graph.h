@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <cmath>
+#include <unordered_set>
 
 
 #include "exception.h"
@@ -103,6 +104,9 @@ public:
     /// @warning Returnerer nullptr dersom det ikke finnes node ved dette navnet.
     std::shared_ptr<Node> getNode(const std::string& label) const;
 
+    int getShortestPath(std::shared_ptr<Node>& from, std::shared_ptr<Node>& to);
+    std::shared_ptr<Edge> getEdge(std::shared_ptr<Node>& first, std::shared_ptr<Node>& second)  const;
+
     /// @brief Genererer n ikke-overlappende posisjoner innenfor vinduet.
     /// @param n Antall poisjoner
     /// @return Vektor med posisjoner
@@ -161,4 +165,8 @@ public:
     /// @brief Laster opp grafstuktur som edge list til .edg fil, med vekting.
     /// @param fileName Filsti, må være .edg fil.
     void saveToEdg(std::filesystem::path fileName);
+
+private:
+    void searchNext(std::shared_ptr<Node>& node);
+    std::unordered_map<std::shared_ptr<Node>, std::unordered_set<std::shared_ptr<Node>>> getOppositeDirectedGraphMap() const;
 };

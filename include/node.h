@@ -11,7 +11,8 @@ class Node
 private:
     std::string label;                  ///< Nodens navn.
     bool selected = false;              ///< Bool som viser om noden er valgt.
-    TDT4102::Point location;           ///< Nodens lokasjon som Point, til bruk i visualsering.
+    TDT4102::Point location;         ///< Nodens lokasjon som Point, til bruk i visualsering.
+    int count = 0;
 public:
     /// @brief Klassens konsturktør.
     /// @param location Lokasjonen noden skal konstruerer på.
@@ -44,6 +45,9 @@ public:
     void setSelect(const bool truthVal) {this -> selected = truthVal;}
 
     void setLocation(const TDT4102::Point location) {this -> location = location;}
+
+    int getCount() const {return count;}
+    void setCount(const int& c) {count = c;}
 };
 
 
