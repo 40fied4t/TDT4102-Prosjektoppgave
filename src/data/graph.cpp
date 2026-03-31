@@ -150,8 +150,12 @@ void Graph::removeAllEdgesOfNode(std::shared_ptr<Node> node){
 }
 std::shared_ptr<Node> Graph::addNode(const TDT4102::Point location, std::string label){
     nodes.emplace_back(std::make_shared<Node>(location, label));
+    if (std::find(labelVec.begin(), labelVec.end(), label) == labelVec.end()){  
+            labelVec.push_back(label);
+    }
     return nodes.back();
 }
+
 void Graph::removeNode(const std::shared_ptr<Node> node){
     
     removeAllEdgesOfNode(node);

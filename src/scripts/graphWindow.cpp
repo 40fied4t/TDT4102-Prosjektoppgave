@@ -33,10 +33,10 @@ GraphWindow::GraphWindow(std::filesystem::path fileName):
     colorMenuButton{mainMenuTopLeft + buffer + 5 * bufferH, btnW, btnH, "color"}, // Maybe dropdown?
 
     pauseMenuButton{topRight + bufferH - bufferW - TDT4102::Point{btnW, 0}, btnW, btnH, "resume"},
-    subMenuButton{subMenuTopLeft + bufferH, btnW, btnH, "load"},
+    subMenuButton{subMenuTopLeft + 4 * bufferH, btnW, btnH, "load"},
     //========================= Textfield
 
-    fileInput{subMenuTopLeft + 2 * bufferH, fieldW, fieldH, "filename"},
+    fileInput{subMenuTopLeft + 3 * bufferH, fieldW, fieldH, "filename"},
 
     //========================= Slider
 
@@ -73,7 +73,6 @@ void GraphWindow::run() {
             case exportMenu:
             case importMenu:
             case mainMenu:
-                drawMain();
                 if (currState != mainMenu) {
                     drawSubMenu();
                 }
@@ -158,6 +157,16 @@ void GraphWindow::updateMain() {
         removeSelectedNodes();
     }
 
+    //================================================== Add
+
+    if (is_key_down(KeyboardKey::A) || is_key_down(KeyboardKey::PLUS)) {
+        addNode(get_mouse_coordinates(), nextLabel);
+        updateNextLabel();
+    }
+
+    if (is_key_down(KeyboardKey::E)) {
+        addSelectedEdges(getInputWeight());
+    }
 
     //================================================== DRAG
 
@@ -198,7 +207,9 @@ void GraphWindow::drawMain() {
 }
 
 void GraphWindow::drawMenu() {
-    draw_rectangle(mainMenuTopLeft, menuW, menuH, menuColor);
+    draw_rectangle(mainMenuTopLeft, 2 * menuW, menuH, menuColor);
+    draw_text(mainMenuTopLeft + TDT4102::Point{200, bufH}, "Menu", TDT4102::Color::black, 48U, TDT4102::Font::arial);
+
     lastMouseLocation = get_mouse_coordinates();
 }
 
@@ -209,6 +220,8 @@ void GraphWindow::drawSubMenu() {
 
 void GraphWindow::drawNode(const std::shared_ptr<Node>& node){ 
     draw_circle(node -> getLocation(), radius, node -> isSelected() ? selectedNodeColor : unselectedNodeColor,borderColor);
+
+    draw_text(node -> getLocation() + TDT4102::Point{-15, -15}, node -> getLabel());
 }
 void GraphWindow::drawEdge(const TDT4102::Point& startPoint, const TDT4102::Point& endPoint, const bool selected, const int& weight){
     TDT4102::Point tangent = getTangent(endPoint - startPoint);
@@ -224,17 +237,17 @@ void GraphWindow::drawEdge(const TDT4102::Point& startPoint, const TDT4102::Poin
     );
     if (distance > 5 * radius) {
         draw_triangle(
-            endPoint -  0.1 * radius * tangent,
-            endPoint - 0.5 * edgeW * radius * tangent +  5 * edgeW * normal,
-            endPoint - 0.5 * edgeW * radius * tangent - 5 * edgeW * normal,
+            endPoint -  0.06 * radius * tangent,
+            endPoint - 0.5 * edgeW * radius * tangent +  3 * edgeW * normal,
+            endPoint - 0.5 * edgeW * radius * tangent - 3 * edgeW * normal,
             selected ? selectedEdgeColor : unselectedEdgeColor
         );
     }
     else {
         draw_triangle(
-            endPoint -  0.1 * radius * tangent,
-            endPoint - 0.5 * edgeW * radius * (distance/(5 * radius)) * tangent +  5 * edgeW * (distance/(5 * radius)) * normal,
-            endPoint - 0.5 * edgeW * radius * (distance/(5 * radius)) * tangent - 5 * edgeW * (distance/(5 * radius)) * normal,
+            endPoint -  0.06 * radius * tangent,
+            endPoint - 0.5 * edgeW * radius * (distance/(5 * radius)) * tangent +  3 * edgeW * (distance/(5 * radius)) * normal,
+            endPoint - 0.5 * edgeW * radius * (distance/(5 * radius)) * tangent - 3 * edgeW * (distance/(5 * radius)) * normal,
             selected ? selectedEdgeColor : unselectedEdgeColor
         );
     }
