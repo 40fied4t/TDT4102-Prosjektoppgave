@@ -156,6 +156,9 @@ void GraphWindow::updateMain() {
     if (is_key_down(KeyboardKey::DELETE)){
         removeSelectedNodes();
     }
+    if (is_key_down(KeyboardKey::R)) {
+        resetLabels();
+    }
 
     //================================================== Add
 
@@ -174,7 +177,7 @@ void GraphWindow::updateMain() {
         for (auto & it : nodes) {
             it -> setLocation(it -> getLocation() + 0.8 * deltaMouseMovement);
         }
-            
+        relativeWindowCoordinates = relativeWindowCoordinates - 0.8 * deltaMouseMovement;
         drawMain();
         next_frame();
 
