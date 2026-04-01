@@ -42,9 +42,11 @@ void Graph::resetLabels() {
         nodes[i] -> setLabel(newLabel);
         labelVec.push_back(newLabel);
     }
+    updateNextLabel();
 }
 
 void Graph::addEdge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, const int weight){
+    if (from == to) return;
     bool alreadyTo = false;
     bool alreadyFrom = false;
     for (auto &it : graphMap[from]) {
@@ -458,11 +460,11 @@ int Graph::getShortestPath(std::shared_ptr<Node>& from, std::shared_ptr<Node>& t
      auto oppositeMap = getOppositeDirectedGraphMap();
      auto currNode = to;
      while (currNode != from) {
-        auto nextNode = *std::min_element(
+        auto nextNode = *std::find_if(
             oppositeMap[currNode].begin(),
             oppositeMap[currNode].end(),
-            [&] (const std::shared_ptr<Node>& a, const std::shared_ptr<Node>& b){
-                return a -> getCount() < b -> getCount();
+            [&] (const std::shared_ptr<Node>& p){
+                return getEdge(currNode, p) -> getWeight() == currNode -> getCount() - p -> getCount();
             }
         );
         getEdge(nextNode, currNode) -> setSelect(true);
@@ -482,7 +484,7 @@ void Graph::searchNext(std::shared_ptr<Node>& node) {
     }    
 }
 
-std::shared_ptr<Edge> Graph::getEdge(std::shared_ptr<Node>& first, std::shared_ptr<Node>& second) const {
+std::shared_ptr<Edge> Graph::getEdge(const std::shared_ptr<Node>& first, const std::shared_ptr<Node>& second) const {
     for (auto& it : edgeVec) {
         bool firstFound = false;
         bool secondFound = false;
@@ -508,4 +510,5 @@ std::unordered_map<std::shared_ptr<Node>, std::unordered_set<std::shared_ptr<Nod
             oppositeMap[it].insert(key);
         }
     }
+    return oppositeMap;
 }
