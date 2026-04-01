@@ -17,8 +17,13 @@ private:
     TDT4102::Point relativeWindowCoordinates{0,0};
 
     bool rightMouseButtonClick = false;
+    bool aClick = false;
+    bool plusClick = false;
+
     int framesSinceLastHoveredLeftClick = 0;
     int framesSinceLastHoveredRightClick = 0;
+
+    int pahtLength = 9999;
 
     TDT4102::Point bottomRight{1024, 768};
     TDT4102::Point bottomLeft{0, 768};
@@ -60,7 +65,7 @@ private:
             colorMenu,
 
         mainScreen,
-            popUp
+            selectingNextNode
     };
     WindowState currState = mainMenu;
 
@@ -120,6 +125,7 @@ public:
     void drawAllEdges();
 
     void drawMouseCoordinates();
+    void drawPathLength();
 
     //========================= Callbackfunctions;
     void loadButtonCallback();

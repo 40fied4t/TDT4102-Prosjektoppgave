@@ -80,7 +80,7 @@ void GraphWindow::run() {
                 next_frame();
                 break;
 
-            case popUp:
+            case selectingNextNode:
             case mainScreen:
                 updateMain();
                 drawMain();
@@ -103,6 +103,8 @@ void GraphWindow::updateMain() {
         framesSinceLastHoveredRightClick++;
     }
 
+    switch (currState) {
+    case mainScreen:
     //================================================== Node Hovered
     if (std::shared_ptr<Node> hoveredNode{getNode(currMouseLocation)}) {
 
@@ -136,13 +138,21 @@ void GraphWindow::updateMain() {
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RCLICK
-        if (is_right_mouse_button_down() && framesSinceLastHoveredRightClick < 10) {
-            removeNode(hoveredNode);
+        if (is_right_mouse_button_down() && framesSinceLastHoveredRightClick < 10 && !rightMouseButtonClick) {
+            for (auto& it : nodes) {
+                it -> setSelect(false);
+            }
+            hoveredNode -> setSelect(true);
+            currState = selectingNextNode;
+
+            framesSinceLastHoveredRightClick = 0;
             rightMouseButtonClick = true;
         }
         else if (is_right_mouse_button_down() && !rightMouseButtonClick) {
             hoveredNode -> updateSelect();
             rightMouseButtonClick = true;
+
+            framesSinceLastHoveredRightClick = 0;
         }
         else if (!is_right_mouse_button_down()) {
             rightMouseButtonClick = false;
@@ -156,19 +166,55 @@ void GraphWindow::updateMain() {
     if (is_key_down(KeyboardKey::DELETE)){
         removeSelectedNodes();
     }
+    //================================================== Reset
     if (is_key_down(KeyboardKey::R)) {
         resetLabels();
     }
 
     //================================================== Add
 
-    if (is_key_down(KeyboardKey::A) || is_key_down(KeyboardKey::PLUS)) {
+    if (is_key_down(KeyboardKey::PLUS) && !plusClick) {
         addNode(get_mouse_coordinates(), nextLabel);
         updateNextLabel();
+        plusClick = true;
+    }
+    else if (!is_key_down(KeyboardKey::PLUS)) {
+        plusClick = false;
     }
 
     if (is_key_down(KeyboardKey::E)) {
         addSelectedEdges(getInputWeight());
+    }
+    break;
+    case selectingNextNode:
+        if (std::shared_ptr<Node> hoveredNode{getNode(currMouseLocation)}) {
+            while (is_left_mouse_button_down()) {
+                hoveredNode -> setLocation(hoveredNode -> getLocation() + deltaMouseMovement);
+                drawMain();
+                next_frame();
+                lastMouseLocation = currMouseLocation;
+                currMouseLocation = get_mouse_coordinates();
+                deltaMouseMovement = currMouseLocation - lastMouseLocation;
+                framesSinceLastHoveredLeftClick = 0;
+            }
+
+            auto previousNode = getSelectedNodes()[0];
+            if (hoveredNode == previousNode) break;
+            else if (is_right_mouse_button_down() && framesSinceLastHoveredRightClick < 10 && !rightMouseButtonClick) {
+                pahtLength = getShortestPath(previousNode, hoveredNode);
+                previousNode -> setSelect(false);
+                framesSinceLastHoveredRightClick = 0;
+                rightMouseButtonClick = true;
+                currState = mainScreen;
+            }
+            else if (is_right_mouse_button_down()) {
+                framesSinceLastHoveredRightClick = 0;
+                rightMouseButtonClick = true;
+            }
+            else  {
+                rightMouseButtonClick = false;
+            }
+        }
     }
 
     //================================================== DRAG
@@ -207,12 +253,12 @@ void GraphWindow::drawMain() {
     drawAllEdges();
     drawAllNodes();
     drawMouseCoordinates();
+    drawPathLength();
 }
 
 void GraphWindow::drawMenu() {
     draw_rectangle(mainMenuTopLeft, 2 * menuW, menuH, menuColor);
     draw_text(mainMenuTopLeft + TDT4102::Point{200, bufH}, "Menu", TDT4102::Color::black, 48U, TDT4102::Font::arial);
-
     lastMouseLocation = get_mouse_coordinates();
 }
 
@@ -317,7 +363,7 @@ void GraphWindow::saveButtonCallback(){
 
 void GraphWindow::pauseMenuCallback() {
     switch (currState) {
-        case popUp:
+        case selectingNextNode:
         case mainScreen:
             currState = mainMenu;
             pauseMenuButton.setLabel("resume");
@@ -464,7 +510,15 @@ void GraphWindow::drawMouseCoordinates() {
     TDT4102::Point coords = get_mouse_coordinates();
     std::string s = "x: " + std::to_string(relativeWindowCoordinates.x + coords.x) + " y: " + std::to_string(relativeWindowCoordinates.y + coords.y);
     draw_text(
-        topLeft + buffer,
+        topLeft + bufferW,
         s
+    );
+}
+
+void GraphWindow::drawPathLength() {
+    std::string s = "path length: " + std::to_string(pahtLength);
+    draw_text(
+        topLeft + buffer,
+        pahtLength < 9999 ? s : "No valid path"
     );
 }
