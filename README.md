@@ -1,20 +1,15 @@
-# TDT4102-Prosjektoppgave
-Prosjektoppgave i TDT4102 prosedyre- og objektsorientert programmering.
+# Graph visualizer
 
-Prosjektplan:
-    Skjelettkode for Graph i include/graph.h
-    Skrive automatiserte tester for Graph i tests/
-    Implementere Graph i src/data/graph.cpp
+### Controls 
 
-    Skjelettkode for GraphWindow i include/graphWindow.h
-    Skrive automatiserte tester for GraphWindow i tests/
-    Implementere GraphWindow i src/scripts/graphWindow.cpp
+double Lclick -> create node connected to currenttly hovered node
+ctrl + double Lclick -> create node connected by directional edge to currently hovered node.
 
-    Utvide program med GUI, bør kanskje gjøres med en gang?
+PLUS -> add new node
+Rclick -> Select node
+E -> add edges between selected nodes
 
-    Skrive dokumentasjon, bør kanskje gjøres fortløpende?
+double rClick -> get pathlength to the next node you Select
+a -> create directed edge to next node you Select
 
-    Eventuelle utvidelser av prosjektet:
-        Vektede/rettede grafer
-    
-    Lage skjermvideo av prosjektet for fremvisning, og få prosjektet godkjent på sal innen uke 15
+number keys -> Added edge will have weight according to digit pressed
