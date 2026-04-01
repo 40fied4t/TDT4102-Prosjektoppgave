@@ -13,6 +13,9 @@ class GraphWindow : public TDT4102::AnimationWindow, public Graph
 {
 private:
     //========================= Variables
+    std::shared_ptr<Node> tempNode = nullptr;
+    int tempWeight = 1;
+
     TDT4102::Point lastMouseLocation{0,0};
     TDT4102::Point relativeWindowCoordinates{0,0};
 
@@ -23,7 +26,7 @@ private:
     int framesSinceLastHoveredLeftClick = 0;
     int framesSinceLastHoveredRightClick = 0;
 
-    int pahtLength = 9999;
+    int pathLength = 9999;
 
     TDT4102::Point bottomRight{1024, 768};
     TDT4102::Point bottomLeft{0, 768};

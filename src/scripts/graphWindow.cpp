@@ -157,6 +157,22 @@ void GraphWindow::updateMain() {
         else if (!is_right_mouse_button_down()) {
             rightMouseButtonClick = false;
         }
+
+        if (is_key_down(KeyboardKey::A) && !aClick) {
+            for (auto& it : nodes) {
+                it -> setSelect(false);
+            }
+            hoveredNode -> setSelect(true);
+
+            tempNode = std::make_shared<Node>(get_mouse_coordinates(), "");
+            tempWeight = getInputWeight();
+
+            currState = selectingNextNode;
+            aClick = true;
+        }
+        else if (!is_key_down(KeyboardKey::A)) {
+            aClick = false;
+        }
     }
     //================================================== Delete
 
@@ -187,6 +203,9 @@ void GraphWindow::updateMain() {
     }
     break;
     case selectingNextNode:
+        if (tempNode) {
+                tempNode -> setLocation(get_mouse_coordinates());
+            }
         if (std::shared_ptr<Node> hoveredNode{getNode(currMouseLocation)}) {
             while (is_left_mouse_button_down()) {
                 hoveredNode -> setLocation(hoveredNode -> getLocation() + deltaMouseMovement);
@@ -197,11 +216,17 @@ void GraphWindow::updateMain() {
                 deltaMouseMovement = currMouseLocation - lastMouseLocation;
                 framesSinceLastHoveredLeftClick = 0;
             }
-
+            
             auto previousNode = getSelectedNodes()[0];
             if (hoveredNode == previousNode) break;
-            else if (is_right_mouse_button_down() && framesSinceLastHoveredRightClick < 10 && !rightMouseButtonClick) {
-                pahtLength = getShortestPath(previousNode, hoveredNode);
+            if (is_right_mouse_button_down() && !rightMouseButtonClick) {
+                if (tempNode) {
+                    addDirectionalEdge(previousNode, hoveredNode, tempWeight);
+                    tempNode = nullptr;
+                }
+                else {
+                    pathLength = getShortestPath(previousNode, hoveredNode);
+                }
                 previousNode -> setSelect(false);
                 framesSinceLastHoveredRightClick = 0;
                 rightMouseButtonClick = true;
@@ -323,6 +348,9 @@ void GraphWindow::drawAllEdges(){
                 }
             }
         }
+    }
+    if (tempNode) {
+        drawEdge(getSelectedNodes()[0] -> getLocation(), tempNode -> getLocation(), false, tempWeight);
     }
 }
 
@@ -516,9 +544,9 @@ void GraphWindow::drawMouseCoordinates() {
 }
 
 void GraphWindow::drawPathLength() {
-    std::string s = "path length: " + std::to_string(pahtLength);
+    std::string s = "path length: " + std::to_string(pathLength);
     draw_text(
         topLeft + buffer,
-        pahtLength < 9999 ? s : "No valid path"
+        pathLength < 9999 ? s : "No valid path"
     );
 }
