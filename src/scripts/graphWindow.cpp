@@ -303,10 +303,10 @@ void GraphWindow::drawEdge(const TDT4102::Point& startPoint, const TDT4102::Poin
     double distance = getDistance(startPoint, endPoint);
 
     draw_quad(
-        startPoint + (edgeW * normal),
-        endPoint + (edgeW * normal),
-        endPoint - (edgeW * normal),
-        startPoint - (edgeW * normal),
+        startPoint + 0.1 * radius * tangent + (edgeW * normal),
+        endPoint - 0.1 * radius * tangent + (edgeW * normal),
+        endPoint - 0.1 * radius * tangent -(edgeW * normal),
+        startPoint + 0.1 * radius * tangent - (edgeW * normal),
         selected ? selectedEdgeColor : unselectedEdgeColor
     );
     if (distance > 5 * radius) {
